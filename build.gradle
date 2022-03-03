@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id "edu.wpi.first.GradleRIO" version "2022.1.1"
+    id 'com.diffplug.spotless' version '6.1.0'
+}
+
+
+group = 'com.epam.esm'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.github.spotbugs:spotbugs:4.5.3'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+spotless {
+    java {
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+
+        importOrder()
+        removeUnusedImports()
+        toggleOffOn()
+        googleJavaFormat('1.12.0')
+        indentWithTabs(2)
+        endWithNewline()
+    }
+    groovyGradle {
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        trimTrailingWhitespace()
+        indentWithTabs(2)
+        endWithNewline()
+    }
+}

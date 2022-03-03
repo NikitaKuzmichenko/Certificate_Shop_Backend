@@ -1,0 +1,2 @@
+rootProject.name = 'springBootApp'
+include ':web',':persistence',':service'

@@ -1,0 +1,69 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'com.epam.esm'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+def restVersion = '4.5.1'
+def lombokVersion = '1.18.22'
+def mainClassName = "com.epam.esm.web.WebApplication"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':persistence')
+    implementation project(':service')
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.auth0:java-jwt:3.18.3'
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    testImplementation "io.rest-assured:rest-assured:${restVersion}"
+    testImplementation "io.rest-assured:json-path:${restVersion}"
+    testImplementation "io.rest-assured:xml-path:${restVersion}"
+    testImplementation "io.rest-assured:json-schema-validator:${restVersion}"
+    testImplementation "io.rest-assured:spring-mock-mvc:${restVersion}"
+    testImplementation "io.rest-assured:spring-web-test-client:${restVersion}"
+
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.3'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    destinationDirectory = file("D:\\project")
+    archivesBaseName = 'project'
+    archiveVersion='1.3.5'
+
+    manifest {
+        attributes(
+                "Implementation-Title": archivesBaseName,
+                "Implementation-Version" : archiveVersion,
+                "Main-Class": "$mainClassName"
+                )
+    }
+}
