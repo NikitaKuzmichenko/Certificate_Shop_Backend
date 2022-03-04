@@ -133,7 +133,7 @@ public class OrderServiceImplTest {
 
 	@Test
 	void createOrderWithoutUser() {
-		when(orderRepository.save(anyObject())).thenReturn(new Long(1));
+		when(orderRepository.save(anyObject())).thenReturn(Long.valueOf(1));
 
 		when(certificateService.getById(anyInt()))
 				.thenReturn(GiftCertificateDtoMapper.mapGiftCertificateToDto(testCertificate));
@@ -145,7 +145,7 @@ public class OrderServiceImplTest {
 
 	@Test
 	void createOrderWithoutCertificate() {
-		when(orderRepository.save(anyObject())).thenReturn(new Long(1));
+		when(orderRepository.save(anyObject())).thenReturn(Long.valueOf(1));
 
 		when(certificateService.getById(anyInt())).thenReturn(null);
 
