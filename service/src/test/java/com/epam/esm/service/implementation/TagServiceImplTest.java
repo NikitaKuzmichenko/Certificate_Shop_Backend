@@ -1,4 +1,4 @@
-package com.epam.esm.service;
+package com.epam.esm.service.implementation;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.epam.esm.dto.mapper.TagDtoMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.compound.tag.TagRepository;
+import com.epam.esm.service.TagService;
 import com.epam.esm.service.implementation.TagServiceImpl;
 import java.util.List;
 import java.util.Optional;

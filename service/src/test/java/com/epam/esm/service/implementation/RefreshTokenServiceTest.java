@@ -1,4 +1,4 @@
-package com.epam.esm.service;
+package com.epam.esm.service.implementation;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
@@ -9,6 +9,7 @@ import com.epam.esm.dto.mapper.UserDtoMapper;
 import com.epam.esm.entity.RefreshToken;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.RefreshTokenRepository;
+import com.epam.esm.service.RefreshTokenService;
 import com.epam.esm.service.implementation.RefreshTokenServiceImpl;
 import com.epam.esm.service.implementation.UserServiceImpl;
 import java.util.Date;

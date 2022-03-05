@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.5.8'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'jacoco'
 }
 
 group = 'com.epam.esm'
@@ -37,6 +38,27 @@ dependencies {
     testImplementation 'org.mockito:mockito-all:1.10.19'
     testImplementation "org.springframework.boot:spring-boot-starter-data-jpa:${dataJpaVersion}"
 }
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'METHOD'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.5
+            }
+        }
+    }
+}
+
+//jacocoTestReport {
+//    reports {
+//        xml.required = false
+//        csv.required = false
+//        html.outputLocation = layout.buildDirectory.dir('D:\\esm\\reports')
+//    }
+//}
 
 test {
     useJUnitPlatform()

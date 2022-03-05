@@ -1,10 +1,11 @@
-package com.epam.esm.service;
+package com.epam.esm.service.implementation;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.service.CertificateCriteriaBuilderService;
 import com.epam.esm.service.implementation.CertificateCriteriaBuilderServiceImpl;
 import com.epam.esm.service.implementation.TagServiceImpl;
 import java.util.List;

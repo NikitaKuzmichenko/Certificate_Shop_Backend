@@ -1,4 +1,4 @@
-package com.epam.esm.service;
+package com.epam.esm.service.implementation;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
@@ -12,6 +12,7 @@ import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.entity.purchase.Purchase;
 import com.epam.esm.repository.OrderRepository;
+import com.epam.esm.service.OrderService;
 import com.epam.esm.service.implementation.GiftCertificateServiceImpl;
 import com.epam.esm.service.implementation.OrderServiceImpl;
 import com.epam.esm.service.implementation.UserServiceImpl;

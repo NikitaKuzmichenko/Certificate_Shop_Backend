@@ -1,4 +1,4 @@
-package com.epam.esm.service;
+package com.epam.esm.service.implementation;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.UserRoleDto;
+import com.epam.esm.service.UserService;
 import com.epam.esm.service.security.UserDetailsServiceImpl;
 import java.util.Set;
 import java.util.stream.Collectors;

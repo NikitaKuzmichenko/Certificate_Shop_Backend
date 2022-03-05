@@ -1,4 +1,4 @@
-package com.epam.esm.service;
+package com.epam.esm.service.implementation;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyObject;
@@ -9,6 +9,7 @@ import com.epam.esm.dto.mapper.UserDtoMapper;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.repository.UserRoleRepository;
+import com.epam.esm.service.UserService;
 import com.epam.esm.service.implementation.UserServiceImpl;
 import java.util.List;
 import java.util.Optional;
