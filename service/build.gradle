@@ -51,15 +51,6 @@ jacocoTestCoverageVerification {
         }
     }
 }
-
-//jacocoTestReport {
-//    reports {
-//        xml.required = false
-//        csv.required = false
-//        html.outputLocation = layout.buildDirectory.dir('D:\\esm\\reports')
-//    }
-//}
-
 test {
     useJUnitPlatform()
 }
