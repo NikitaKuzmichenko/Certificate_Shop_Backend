@@ -1,21 +1,10 @@
 plugins {
     id 'org.springframework.boot' version '2.6.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
 }
-
-group = 'com.epam.esm'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
 
 def restVersion = '4.5.1'
-def lombokVersion = '1.18.22'
 def mainClassName = "com.epam.esm.web.WebApplication"
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation project(':persistence')
     implementation project(':service')
@@ -29,9 +18,6 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'com.auth0:java-jwt:3.18.3'
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testImplementation "io.rest-assured:rest-assured:${restVersion}"
     testImplementation "io.rest-assured:json-path:${restVersion}"

@@ -1,22 +1,10 @@
 plugins {
     id 'org.springframework.boot' version '2.5.8'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
-    id 'jacoco'
 }
 
-group = 'com.epam.esm'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
-
-def lombokVersion = '1.18.22'
 def dataJpaVersion = '2.6.2'
 def junitVersion = '5.7.1'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
 
     implementation project(':persistence')
@@ -25,9 +13,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${dataJpaVersion}"
-
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-test'
