@@ -20,10 +20,10 @@ test {
     useJUnitPlatform()
 }
 
-bootJar {
+bootWar {
     enabled = false
 }
 
-jar {
+war {
     enabled = true
 }

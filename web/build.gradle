@@ -34,7 +34,7 @@ test {
     useJUnitPlatform()
 }
 
-jar {
+war {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
