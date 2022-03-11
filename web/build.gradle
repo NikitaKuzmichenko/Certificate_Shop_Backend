@@ -5,6 +5,7 @@ plugins {
 
 def restVersion = '4.5.1'
 def mainClassName = "com.epam.esm.web.WebApplication"
+
 dependencies {
     implementation project(':persistence')
     implementation project(':service')
@@ -13,6 +14,8 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-tomcat:2.6.4'
+
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -34,6 +37,11 @@ test {
     useJUnitPlatform()
 }
 
+bootWar {
+    archivesBaseName = 'springApp'
+    archiveName 'springApp.war'
+}
+
 war {
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -41,15 +49,8 @@ war {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
-    destinationDirectory = file("D:\\project")
-    archivesBaseName = 'project'
-    archiveVersion='1.3.5'
 
     manifest {
-        attributes(
-                "Implementation-Title": archivesBaseName,
-                "Implementation-Version" : archiveVersion,
-                "Main-Class": "$mainClassName"
-                )
+        attributes("Main-Class": "$mainClassName")
     }
 }
