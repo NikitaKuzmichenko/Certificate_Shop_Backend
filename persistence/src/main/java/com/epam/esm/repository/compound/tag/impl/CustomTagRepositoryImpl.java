@@ -2,6 +2,7 @@ package com.epam.esm.repository.compound.tag.impl;
 
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
+import com.epam.esm.entity.purchase.Purchase;
 import com.epam.esm.repository.compound.tag.CustomTagRepository;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,9 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 */
 @Component
 public class CustomTagRepositoryImpl implements CustomTagRepository {
-
 	private static final String USER_WITH_MAX_SPENDING =
-			" select o.userId from Purchase o" + " group by o.userId" + " order by sum(o.price) desc";
+			" select o from Purchase o"
+					+ " group by o.id"
+					+ " order by sum(o.price) desc";
 
 	private static final String TEMP_USER = "user";
 
@@ -72,15 +74,15 @@ public class CustomTagRepositoryImpl implements CustomTagRepository {
 	@Transactional
 	public Tag getPopular() {
 		try {
-			User user =
+			Purchase purchase =
 					entityManager
-							.createQuery(USER_WITH_MAX_SPENDING, User.class)
+							.createQuery(USER_WITH_MAX_SPENDING, Purchase.class)
 							.setMaxResults(1)
 							.getSingleResult();
 
 			return entityManager
 					.createQuery(USER_CERTIFICATES, Tag.class)
-					.setParameter(TEMP_USER, user)
+					.setParameter(TEMP_USER, purchase.getUserId())
 					.setMaxResults(1)
 					.getSingleResult();
 
