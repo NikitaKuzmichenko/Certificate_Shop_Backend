@@ -4,10 +4,15 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.epam.esm.dto.RefreshTokenDto;
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.mapper.RefreshTokenDtoMapper;
 import com.epam.esm.dto.mapper.UserDtoMapper;
 import com.epam.esm.entity.RefreshToken;
 import com.epam.esm.entity.User;
+import com.epam.esm.exception.DuplicateEntityException;
+import com.epam.esm.exception.EntityNotExistException;
+import com.epam.esm.exception.InvalidTokenException;
 import com.epam.esm.repository.RefreshTokenRepository;
 import com.epam.esm.service.RefreshTokenService;
 import com.epam.esm.service.implementation.RefreshTokenServiceImpl;
@@ -20,6 +25,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public class RefreshTokenServiceTest {
 
@@ -32,8 +38,10 @@ public class RefreshTokenServiceTest {
 			new RefreshTokenServiceImpl(tokenRepository, userService);
 
 	private static RefreshToken token;
+	private static RefreshTokenDto tokenDto;
 
 	private static User user;
+	private static UserDto userDto;
 
 	@BeforeAll
 	public static void init() {
@@ -45,6 +53,9 @@ public class RefreshTokenServiceTest {
 		token.setExpirationDate(new Date());
 		token.setCreationDate(new Date());
 		token.setToken("token");
+
+		tokenDto = RefreshTokenDtoMapper.mapRefreshTokenToDto(token);
+		userDto =  UserDtoMapper.mapUserToDto(user);
 	}
 
 	@AfterEach
@@ -53,69 +64,74 @@ public class RefreshTokenServiceTest {
 	}
 
 	@Test
-	void saveOrUpdateTest() {
+	void saveOrUpdateExistingToken() {
 		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.ofNullable(token));
 		when(tokenRepository.save(anyObject())).thenReturn(token);
+		when(userService.getById(anyLong())).thenReturn(userDto);
+		Assertions.assertEquals(token.getId(), refreshTokenService.saveOrUpdate(tokenDto));
+	}
+
+	@Test
+	void saveOrUpdateNewToken() {
+		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.empty());
+		when(tokenRepository.save(anyObject())).thenReturn(token);
+		when(userService.getById(anyLong())).thenReturn(userDto);
+		Assertions.assertEquals(token.getId(), refreshTokenService.saveOrUpdate(tokenDto));
+	}
+
+	@Test
+	void saveOrUpdateDuplicateToken() {
+		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.empty());
+		when(tokenRepository.save(anyObject())).thenThrow(new DataIntegrityViolationException(""));
 		when(userService.getById(anyLong())).thenReturn(UserDtoMapper.mapUserToDto(user));
-		Assertions.assertEquals(
-				token.getId(),
-				refreshTokenService.saveOrUpdate(RefreshTokenDtoMapper.mapRefreshTokenToDto(token)));
+		Assertions.assertThrows(DuplicateEntityException.class, ()->refreshTokenService.saveOrUpdate(tokenDto));
 	}
 
 	@Test
-	void saveOrUpdateWithoutUserTest() {
-		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.ofNullable(null));
-		when(tokenRepository.save(anyObject())).thenReturn(token);
-		when(userService.getById(anyLong())).thenReturn(UserDtoMapper.mapUserToDto(null));
-		Assertions.assertNull(
-				refreshTokenService.saveOrUpdate(RefreshTokenDtoMapper.mapRefreshTokenToDto(token)));
-	}
-
-	@Test
-	void findByUserIdTest() {
+	void getById() {
 		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.ofNullable(token));
-		Assertions.assertNotNull(refreshTokenService.getByUserId(1));
+		Assertions.assertEquals(tokenDto,refreshTokenService.getByUserId(1));
 	}
 
 	@Test
-	void findByNotExistingUserIdTest() {
-		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.ofNullable(null));
-		Assertions.assertNull(refreshTokenService.getByUserId(1));
+	void findByNotExistingUserId() {
+		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.empty());
+		Assertions.assertThrows(EntityNotExistException.class,()->refreshTokenService.getByUserId(1));
 	}
 
 	@Test
-	void getByIdTest() {
-		when(tokenRepository.findById(anyObject())).thenReturn(Optional.ofNullable(token));
-		Assertions.assertNotNull(refreshTokenService.getById(1));
-	}
-
-	@Test
-	void getByNotExistingIdTest() {
-		when(tokenRepository.findById(anyObject())).thenReturn(Optional.ofNullable(null));
-		Assertions.assertNull(refreshTokenService.getById(1));
-	}
-
-	@Test
-	void getByUserEmailTest() {
+	void getByUserEmail() {
 		when(tokenRepository.findByUserIdEmail(anyString())).thenReturn(Optional.ofNullable(token));
-		Assertions.assertNotNull(refreshTokenService.getByUserEmail("e"));
+		Assertions.assertEquals(tokenDto,refreshTokenService.getByUserEmail("e"));
 	}
 
 	@Test
-	void getByNotExistingUserEmailTest() {
-		when(tokenRepository.findByUserIdEmail(anyString())).thenReturn(Optional.ofNullable(null));
-		Assertions.assertNull(refreshTokenService.getByUserEmail("e"));
+	void getByNotExistingUserEmail() {
+		when(tokenRepository.findByUserIdEmail(anyString())).thenReturn(Optional.empty());
+		Assertions.assertThrows(EntityNotExistException.class,()->refreshTokenService.getByUserEmail("e"));
+	}
+
+	@Test
+	void getByUserId(){
+		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.ofNullable(token));
+		Assertions.assertEquals(tokenDto,refreshTokenService.getByUserId(1));
+	}
+
+	@Test
+	void getByNotExistingUserId(){
+		when(tokenRepository.findByUserIdId(anyLong())).thenReturn(Optional.empty());
+		Assertions.assertThrows(EntityNotExistException.class,()->refreshTokenService.getByUserId(1));
 	}
 
 	@Test
 	void getByTokenTest() {
 		when(tokenRepository.findByToken(anyString())).thenReturn(Optional.ofNullable(token));
-		Assertions.assertNotNull(refreshTokenService.getByToken("1"));
+		Assertions.assertEquals(tokenDto,refreshTokenService.getByToken("1"));
 	}
 
 	@Test
 	void getByNotExistingTokenTest() {
-		when(tokenRepository.findByToken(anyString())).thenReturn(Optional.ofNullable(null));
-		Assertions.assertNull(refreshTokenService.getByToken("1"));
+		when(tokenRepository.findByToken(anyString())).thenReturn(Optional.empty());
+		Assertions.assertThrows(InvalidTokenException.class,()->refreshTokenService.getByToken("1"));
 	}
 }

@@ -1,13 +1,11 @@
 package com.epam.esm.web.exceptionhandler;
 
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.*;
-
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.Locale;
-import javax.validation.ConstraintViolationException;
+import com.epam.esm.exception.BadInputException;
+import com.epam.esm.exception.DuplicateEntityException;
+import com.epam.esm.exception.EntityNotExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -18,22 +16,26 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.util.Locale;
+
+import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.*;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	@Autowired private MessageSource messageSource;
 
-	@ExceptionHandler(IllegalArgumentException.class)
+	@ExceptionHandler(BadInputException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public ResponseEntity<?> illegalArgumentExceptionHandler(Exception exception, Locale locale) {
 		return badRequestResponse(locale);
 	}
 
-	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+	@ExceptionHandler(DuplicateEntityException.class)
 	@ResponseStatus(HttpStatus.CONFLICT)
 	@ResponseBody
-	public ResponseEntity<?> integrityConstraintExceptionHandler(Exception exception, Locale locale) {
+	public ResponseEntity<?> duplicateEntityExceptionHandler(Exception exception, Locale locale) {
 		return conflictResponse(locale);
 	}
 
@@ -44,11 +46,11 @@ public class GlobalExceptionHandler {
 		return notFoundResponse(locale);
 	}
 
-	@ExceptionHandler(ConstraintViolationException.class)
+	@ExceptionHandler(EntityNotExistException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
-	public ResponseEntity<?> notValidEntityExceptionHandler(Exception exception, Locale locale) {
-		return badRequestResponse(locale);
+	public ResponseEntity<?> entityNotExistExceptionHandler(Exception exception, Locale locale) {
+		return notFoundResponse(locale);
 	}
 
 	@ExceptionHandler(JWTDecodeException.class)

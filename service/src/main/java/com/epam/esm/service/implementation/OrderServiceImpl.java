@@ -10,6 +10,9 @@ import com.epam.esm.dto.mapper.UserDtoMapper;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.entity.purchase.Purchase;
+import com.epam.esm.exception.BadInputException;
+import com.epam.esm.exception.DuplicateEntityException;
+import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.pagination.OffsetLimitPage;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.service.GiftCertificateService;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -47,14 +51,10 @@ public class OrderServiceImpl implements OrderService {
 		this.giftCertificateService = giftCertificateService;
 	}
 
-	/**
-	* @param orderDto element to be appended to database
-	* @return PK of inserted element, or {@code null} if value can not be inserted
-	*/
 	@Override
 	public Long create(@Valid OrderDto orderDto) {
 		if (orderDto == null || orderDto.getPurchases() == null) {
-			return null;
+			throw new BadInputException();
 		}
 
 		Order order = OrderDtoMapper.getOrderFromDto(orderDto);
@@ -62,15 +62,9 @@ public class OrderServiceImpl implements OrderService {
 
 		for (PurchaseDto purchaseDto : orderDto.getPurchases()) {
 			UserDto user = userService.getById(purchaseDto.getUserId());
-			if (user == null) {
-				return null;
-			}
 
 			GiftCertificateDto certificateDto =
 					giftCertificateService.getById(purchaseDto.getGiftCertificateId());
-			if (certificateDto == null) {
-				return null;
-			}
 
 			Purchase purchase = new Purchase();
 			purchase.setPrice(certificateDto.getPrice());
@@ -84,62 +78,30 @@ public class OrderServiceImpl implements OrderService {
 
 		order.setPurchases(purchases);
 
-		return orderRepository.save(order).getId();
-	}
-
-	/**
-	* @param userId {@code User} who owns orders
-	* @return elements in this database, if database empty return empty list
-	*/
-	@Override
-	public List<OrderDto> getByUserId(long userId) {
-		User user = UserDtoMapper.mapDtoToUser(userService.getById(userId));
-		if (user == null) {
-			return null;
+		try {
+			return orderRepository.save(order).getId();
+		}
+		catch (DataIntegrityViolationException e) {
+			throw new DuplicateEntityException();
 		}
 
-		return orderRepository.getOrders(user).stream()
-				.map(OrderDtoMapper::mapOrderToDto)
-				.collect(Collectors.toList());
 	}
 
-	/**
-	* @param limit max amount of elements in result list
-	* @param offset elements skipped before reading
-	* @throws IllegalArgumentException if limit or offset is negative
-	*/
-	private void paginationCheck(long limit, long offset) {
-		if (limit < 0 || offset < 0) {
-			throw new IllegalArgumentException("limit or offset is negative");
-		}
-	}
-
-	/**
-	* @param userId {@code User} who owns orders
-	* @param limit max amount of elements in result list
-	* @param offset elements skipped before reading
-	* @return elements in this database, if database empty return empty list
-	* @throws IllegalArgumentException if limit or offset is negative
-	*/
 	@Override
 	public List<OrderDto> getByUserId(long userId, long limit, long offset) {
-		paginationCheck(limit, offset);
+		if (limit < 0 || offset < 0) {
+			throw new BadInputException();
+		}
 
 		User user = UserDtoMapper.mapDtoToUser(userService.getById(userId));
-		if (user == null) {
-			return null;
-		}
 		return orderRepository.getOrders(user, new OffsetLimitPage((int) limit, (int) offset)).stream()
 				.map(OrderDtoMapper::mapOrderToDto)
 				.collect(Collectors.toList());
 	}
 
-	/**
-	* @param orderId id of {@code Purchase} entity
-	* @return elements in this database, if database empty return empty list
-	*/
 	@Override
 	public OrderDto getByOrderId(long orderId) {
-		return OrderDtoMapper.mapOrderToDto(orderRepository.findById(orderId).orElse(null));
+		return OrderDtoMapper.mapOrderToDto(
+				orderRepository.findById(orderId).orElseThrow(EntityNotExistException::new));
 	}
 }

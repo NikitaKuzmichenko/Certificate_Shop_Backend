@@ -1,6 +1,6 @@
 package com.epam.esm.web.exceptionhandler;
 
-import com.epam.esm.web.wrapper.ExceptionWrapper;
+import com.epam.esm.web.representation.exception.ExceptionWrapper;
 import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

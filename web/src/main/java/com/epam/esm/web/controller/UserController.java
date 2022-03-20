@@ -1,18 +1,11 @@
 package com.epam.esm.web.controller;
 
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.badRequestResponse;
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.notFoundResponse;
-
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.UserRoleDto;
 import com.epam.esm.service.UserService;
 import com.epam.esm.web.representation.assembler.UserRepresentationAssembler;
 import com.epam.esm.web.representation.dto.collection.CollectionWrapper;
 import com.epam.esm.web.representation.dto.mapper.UserViewDtoMapper;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -20,6 +13,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequestMapping("/users")
 @RestController
@@ -38,9 +36,7 @@ public class UserController {
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getUser(@PathVariable("id") long id, Locale locale) {
 		UserDto user = userService.getById(id);
-		return user == null
-				? notFoundResponse(locale)
-				: ResponseEntity.status(HttpStatus.OK.value())
+		return ResponseEntity.status(HttpStatus.OK.value())
 						.body(userRepresentationAssembler.toModel(UserViewDtoMapper.toViewDto(user)));
 	}
 
@@ -59,10 +55,6 @@ public class UserController {
 		}
 
 		List<UserDto> users = userService.getAll(limit, offset);
-
-		if (users == null) {
-			return badRequestResponse(locale);
-		}
 
 		CollectionWrapper<CollectionModel> result = new CollectionWrapper<>();
 		result.setCollection(
@@ -83,9 +75,7 @@ public class UserController {
 	public ResponseEntity<?> createDefaultUsers(@RequestBody UserDto user, Locale locale) {
 		user.setRoles(DEFAULT_ROLES);
 		Long id = userService.createAndEncodePassword(user);
-		return id == null
-				? badRequestResponse(locale)
-				: ResponseEntity.status(HttpStatus.CREATED.value())
+		return ResponseEntity.status(HttpStatus.CREATED.value())
 						.body(userRepresentationAssembler.getLinksForCreate(id));
 	}
 }

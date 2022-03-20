@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.PurchaseDto;
+import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.service.implementation.OrderServiceImpl;
 import com.epam.esm.web.controller.OrderController;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -92,7 +93,7 @@ class OrderControllerTest {
 			username = "user",
 			authorities = {"READ_ALL"})
 	void getNotExistingOrderById() {
-		Mockito.when(orderService.getByOrderId(Mockito.anyLong())).thenReturn(null);
+		Mockito.when(orderService.getByOrderId(Mockito.anyLong())).thenThrow(new EntityNotExistException());
 
 		RestAssuredMockMvc.given().when().get(GET_BY_ID_PATH).then().statusCode(404);
 	}
@@ -131,25 +132,8 @@ class OrderControllerTest {
 	@WithMockUser(
 			username = "user",
 			authorities = {"WRITE_ALL"})
-	void failedToCreateOrder() {
+	void tryCreateOrderForOtherUser() {
 		Mockito.when(orderService.create(Mockito.any())).thenReturn(Long.valueOf(1));
-
-		RestAssuredMockMvc.given()
-				.contentType("application/json")
-				.param("userId", 1)
-				.param("certificateId", Set.of(1))
-				.when()
-				.post(CREATE_PATH)
-				.then()
-				.statusCode(403);
-	}
-
-	@Test
-	@WithMockUser(
-			username = "user",
-			authorities = {"WRITE_ALL"})
-	void failedCreateOrder() {
-		Mockito.when(orderService.create(Mockito.any())).thenReturn(null);
 
 		RestAssuredMockMvc.given()
 				.contentType("application/json")

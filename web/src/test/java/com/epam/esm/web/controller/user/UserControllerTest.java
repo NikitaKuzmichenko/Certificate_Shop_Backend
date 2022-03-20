@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.service.implementation.UserServiceImpl;
 import com.epam.esm.web.controller.UserController;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -70,7 +71,7 @@ class UserControllerTest {
 			username = "user",
 			authorities = {"READ_ALL"})
 	void getNotExistingUserById() {
-		Mockito.when(userService.getById(Mockito.anyLong())).thenReturn(null);
+		Mockito.when(userService.getById(Mockito.anyLong())).thenThrow(new EntityNotExistException());
 
 		RestAssuredMockMvc.given().when().get(GET_BY_ID_PATH).then().statusCode(403);
 	}
@@ -114,16 +115,4 @@ class UserControllerTest {
 				.statusCode(201);
 	}
 
-	@Test
-	void createFailedUser() {
-		Mockito.when(userService.createAndEncodePassword(Mockito.any())).thenReturn(null);
-
-		RestAssuredMockMvc.given()
-				.contentType("application/json")
-				.body(dto)
-				.when()
-				.post(CREATE_PATH)
-				.then()
-				.statusCode(400);
-	}
 }

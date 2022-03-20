@@ -23,21 +23,19 @@ public class OrderRepresentationAssembler
 
 	@Override
 	public void addLinks(EntityModel<OrderViewDto> resource) {
-		if (resource.getContent() == null) {
-			return;
+		long orderId = 0;
+		OrderViewDto dto = resource.getContent();
+		if(dto != null) {
+			orderId = dto.getId();
+
+			if (dto.getPurchases() != null && !dto.getPurchases().isEmpty()) {
+				long userId = dto.getPurchases().get(0).getUserId();
+
+				resource.add(
+						linkTo(methodOn(OrderController.class).getUserOrders(userId, null, null, null))
+								.withSelfRel());
+			}
 		}
-
-		long orderId = resource.getContent().getId();
-
-		if (resource.getContent().getPurchases() != null
-				&& resource.getContent().getPurchases().size() != 0) {
-			long userId = resource.getContent().getPurchases().get(0).getUserId();
-
-			resource.add(
-					linkTo(methodOn(OrderController.class).getUserOrders(userId, null, null, null))
-							.withSelfRel());
-		}
-
 		resource.add(
 				linkTo(methodOn(OrderController.class).getOrders(orderId, null)).withRel(GET_LINK_NAME));
 	}

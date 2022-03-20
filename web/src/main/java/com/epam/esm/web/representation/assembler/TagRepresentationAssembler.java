@@ -24,11 +24,12 @@ public class TagRepresentationAssembler implements SimpleRepresentationModelAsse
 
 	@Override
 	public void addLinks(EntityModel<TagViewDto> resource) {
-		if (resource.getContent() == null) {
-			return;
+		long id = 0;
+		TagViewDto dto = resource.getContent();
+		if (dto != null) {
+			id = dto.getId();
 		}
 
-		long id = resource.getContent().getId();
 		resource.add(linkTo(methodOn(TagController.class).getTag(id, null)).withSelfRel());
 		resource.add(
 				linkTo(methodOn(TagController.class).deleteTag(id, null)).withRel(DELETE_LINK_NAME));

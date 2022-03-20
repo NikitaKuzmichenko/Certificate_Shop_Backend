@@ -23,11 +23,12 @@ public class UserRepresentationAssembler
 
 	@Override
 	public void addLinks(EntityModel<UserViewDto> resource) {
-		if (resource.getContent() == null) {
-			return;
+		UserViewDto dto = resource.getContent();
+		long id =0;
+		if (dto != null) {
+			id = dto.getId();
 		}
 
-		long id = resource.getContent().getId();
 		resource.add(linkTo(methodOn(UserController.class).getUser(id, null)).withSelfRel());
 		resource.add(
 				linkTo(methodOn(UserController.class).getUsers(null, null, null))

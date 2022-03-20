@@ -1,4 +1,4 @@
-package com.epam.esm.web.wrapper;
+package com.epam.esm.web.representation.exception;
 
 import java.io.Serializable;
 

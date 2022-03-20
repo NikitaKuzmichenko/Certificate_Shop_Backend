@@ -4,6 +4,9 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.mapper.GiftCertificateDtoMapper;
 import com.epam.esm.dto.mapper.OrderDtoMapper;
 import com.epam.esm.dto.mapper.UserDtoMapper;
@@ -11,6 +14,8 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.entity.purchase.Purchase;
+import com.epam.esm.exception.BadInputException;
+import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.implementation.GiftCertificateServiceImpl;
@@ -26,30 +31,34 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 public class OrderServiceImplTest {
 
 	@Mock private static final OrderRepository orderRepository = mock(OrderRepository.class);
 
-	@Mock
-	private static final GiftCertificateServiceImpl certificateService =
-			mock(GiftCertificateServiceImpl.class);
+	@Mock private static final GiftCertificateServiceImpl certificateService = mock(GiftCertificateServiceImpl.class);
 
 	@Mock private static final UserServiceImpl userService = mock(UserServiceImpl.class);
 
-	private static final OrderService orderService =
-			new OrderServiceImpl(orderRepository, userService, certificateService);
+	private static final OrderService orderService = new OrderServiceImpl(orderRepository, userService, certificateService);
 
 	private static Order testOrder;
-	private static User testUser;
-	private static GiftCertificate testCertificate;
+
+	private static OrderDto testOrderDto;
+	private static UserDto testUserDto;
+	private static GiftCertificateDto testCertificateDto;
 
 	@BeforeAll
 	public static void init() {
 		BigDecimal price = new BigDecimal("21.20");
-		testCertificate = new GiftCertificate();
+		GiftCertificate testCertificate = new GiftCertificate();
 		testCertificate.setName("name1");
 		testCertificate.setDescription("desc");
 		testCertificate.setPrice(price);
@@ -59,7 +68,7 @@ public class OrderServiceImplTest {
 		testCertificate.setId(1);
 		testCertificate.setTags(null);
 
-		testUser = new User();
+		User testUser = new User();
 		testUser.setId(1);
 		testUser.setEmail("email");
 		testUser.setPassword("password");
@@ -75,6 +84,10 @@ public class OrderServiceImplTest {
 		testOrder.setOrderDate(ZonedDateTime.now());
 		testOrder.setId(1);
 		testOrder.setPurchases(List.of(testPurchase));
+
+		testOrderDto = OrderDtoMapper.mapOrderToDto(testOrder);
+		testUserDto = UserDtoMapper.mapUserToDto(testUser);
+		testCertificateDto = GiftCertificateDtoMapper.mapGiftCertificateToDto(testCertificate);
 	}
 
 	@AfterEach
@@ -83,109 +96,37 @@ public class OrderServiceImplTest {
 	}
 
 	@Test
-	void getOrder() {
-		when(orderRepository.findById(anyLong())).thenReturn(Optional.ofNullable(testOrder));
-		Assertions.assertEquals(OrderDtoMapper.mapOrderToDto(testOrder), orderService.getByOrderId(1));
-	}
-
-	@Test
-	void getNotExistingOrder() {
-		when(orderRepository.findById(anyLong())).thenReturn(Optional.ofNullable(null));
-		Assertions.assertNull(orderService.getByOrderId(1));
-	}
-
-	@Test
-	void getByUserId() {
-		when(orderRepository.getOrders(anyObject())).thenReturn(List.of(testOrder));
-
-		when(certificateService.getById(anyInt()))
-				.thenReturn(GiftCertificateDtoMapper.mapGiftCertificateToDto(testCertificate));
-
-		when(userService.getById(anyInt())).thenReturn(UserDtoMapper.mapUserToDto(testUser));
-
-		Assertions.assertEquals(
-				Stream.of(testOrder).map(OrderDtoMapper::mapOrderToDto).collect(Collectors.toList()),
-				orderService.getByUserId(1));
-	}
-
-	@Test
-	void getOrderWithoutUser() {
-		when(orderRepository.getOrders(anyObject())).thenReturn(List.of(testOrder));
-
-		when(certificateService.getById(anyInt()))
-				.thenReturn(GiftCertificateDtoMapper.mapGiftCertificateToDto(testCertificate));
-
-		when(userService.getById(anyInt())).thenReturn(null);
-
-		Assertions.assertNull(orderService.getByUserId(1));
-	}
-
-	@Test
 	void createOrder() {
 		when(orderRepository.save(anyObject())).thenReturn(testOrder);
+		when(certificateService.getById(anyInt())).thenReturn(testCertificateDto);
+		when(userService.getById(anyInt())).thenReturn(testUserDto);
 
-		when(certificateService.getById(anyInt()))
-				.thenReturn(GiftCertificateDtoMapper.mapGiftCertificateToDto(testCertificate));
-
-		when(userService.getById(anyInt())).thenReturn(UserDtoMapper.mapUserToDto(testUser));
-
-		Assertions.assertNotNull(orderService.create(OrderDtoMapper.mapOrderToDto(testOrder)));
+		Assertions.assertNotNull(orderService.create(testOrderDto));
 	}
 
 	@Test
 	void createOrderWithoutUser() {
-		when(orderRepository.save(anyObject())).thenReturn(Long.valueOf(1));
+		when(orderRepository.save(anyObject())).thenReturn(1L);
+		when(certificateService.getById(anyInt())).thenReturn(testCertificateDto);
+		when(userService.getById(anyInt())).thenThrow(new EntityNotExistException());
 
-		when(certificateService.getById(anyInt()))
-				.thenReturn(GiftCertificateDtoMapper.mapGiftCertificateToDto(testCertificate));
-
-		when(userService.getById(anyInt())).thenReturn(null);
-
-		Assertions.assertNull(orderService.create(OrderDtoMapper.mapOrderToDto(testOrder)));
+		Assertions.assertThrows(EntityNotExistException.class,()->orderService.create(testOrderDto));
 	}
 
 	@Test
 	void createOrderWithoutCertificate() {
-		when(orderRepository.save(anyObject())).thenReturn(Long.valueOf(1));
+		when(orderRepository.save(anyObject())).thenReturn(1L);
+		when(certificateService.getById(anyInt())).thenThrow(new EntityNotExistException());
+		when(userService.getById(anyInt())).thenReturn(testUserDto);
 
-		when(certificateService.getById(anyInt())).thenReturn(null);
-
-		when(userService.getById(anyInt())).thenReturn(UserDtoMapper.mapUserToDto(testUser));
-
-		Assertions.assertNull(orderService.create(OrderDtoMapper.mapOrderToDto(testOrder)));
-	}
-
-	@Test
-	void getAllByUserId() {
-		List<Order> orders = List.of(testOrder);
-
-		when(orderRepository.getOrders(anyObject())).thenReturn(orders);
-
-		when(userService.getById(anyInt())).thenReturn(UserDtoMapper.mapUserToDto(testUser));
-
-		Assertions.assertEquals(
-				orders.stream().map(OrderDtoMapper::mapOrderToDto).collect(Collectors.toList()),
-				orderService.getByUserId(1));
-	}
-
-	@Test
-	void getAllByNotExistingUserId() {
-		List<Order> orders = List.of(testOrder);
-
-		when(orderRepository.getOrders(anyObject())).thenReturn(orders);
-
-		when(userService.getById(anyInt())).thenReturn(UserDtoMapper.mapUserToDto(null));
-
-		Assertions.assertNull(orderService.getByUserId(1));
+		Assertions.assertThrows(EntityNotExistException.class,()->orderService.create(testOrderDto));
 	}
 
 	@Test
 	void getAllByUserIdWithLimitAndOffset() {
 		List<Order> orders = List.of(testOrder);
-
 		when(orderRepository.getOrders(anyObject(), anyObject())).thenReturn(orders);
-
-		when(userService.getById(anyInt())).thenReturn(UserDtoMapper.mapUserToDto(testUser));
+		when(userService.getById(anyInt())).thenReturn(testUserDto);
 
 		Assertions.assertEquals(
 				orders.stream().map(OrderDtoMapper::mapOrderToDto).collect(Collectors.toList()),
@@ -195,11 +136,31 @@ public class OrderServiceImplTest {
 	@Test
 	void getAllByNotExistingUserIdWithLimitAndOffset() {
 		List<Order> orders = List.of(testOrder);
-
 		when(orderRepository.getOrders(anyObject(), anyObject())).thenReturn(orders);
+		when(userService.getById(anyInt())).thenThrow(new EntityNotExistException());
 
-		when(userService.getById(anyInt())).thenReturn(UserDtoMapper.mapUserToDto(null));
+		Assertions.assertThrows(EntityNotExistException.class, ()->orderService.getByUserId(1, 1, 1));
+	}
 
-		Assertions.assertNull(orderService.getByUserId(1, 1, 1));
+	@ParameterizedTest
+	@CsvSource({"-1,-1", "-1,1", "1,-1"})
+	void getAllUserWitchIncorrectLimitAndOffset(int limit,int offset) {
+		List<Order> orders = List.of(testOrder);
+		when(orderRepository.getOrders(anyObject(), anyObject())).thenReturn(orders);
+		when(userService.getById(anyInt())).thenReturn(testUserDto);
+
+		Assertions.assertThrows(BadInputException.class, ()->orderService.getByUserId(1, limit, offset));
+	}
+
+	@Test
+	void getOrderById() {
+		when(orderRepository.findById(anyLong())).thenReturn(Optional.ofNullable(testOrder));
+		Assertions.assertEquals(testOrderDto, orderService.getByOrderId(1));
+	}
+
+	@Test
+	void getNotExistingOrderById() {
+		when(orderRepository.findById(anyLong())).thenReturn(Optional.empty());
+		Assertions.assertThrows(EntityNotExistException.class, ()->orderService.getByOrderId(1));
 	}
 }

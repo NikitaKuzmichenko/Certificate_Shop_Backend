@@ -1,17 +1,11 @@
 package com.epam.esm.web.controller;
 
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.badRequestResponse;
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.notFoundResponse;
-
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.service.CertificateCriteriaBuilderService;
 import com.epam.esm.service.implementation.GiftCertificateServiceImpl;
 import com.epam.esm.web.representation.assembler.GiftCertificateRepresentationAssembler;
 import com.epam.esm.web.representation.dto.collection.CollectionWrapper;
 import com.epam.esm.web.representation.dto.mapper.GiftCertificateViewDtoMapper;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.hateoas.CollectionModel;
@@ -20,6 +14,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.badRequestResponse;
 
 @RequestMapping("/certificates")
 @RestController
@@ -38,16 +38,15 @@ public class GiftCertificateController {
 	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createGiftCertificate(
 			@RequestBody GiftCertificateDto certificate, Locale locale) {
+
 		Long id = service.create(certificate);
-		return id == null
-				? badRequestResponse(locale)
-				: ResponseEntity.status(HttpStatus.CREATED.value())
+		return ResponseEntity.status(HttpStatus.CREATED.value())
 						.body(giftCertificateRepresentationAssembler.getLinksForCreate(id));
 	}
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
 	@PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> updateGiftCertificates(
+	public ResponseEntity<?> putGiftCertificates(
 			@PathVariable("id") long id, @RequestBody GiftCertificateDto certificate, Locale locale) {
 
 		if (certificate == null) {
@@ -55,15 +54,9 @@ public class GiftCertificateController {
 		}
 
 		certificate.setId(id);
-		if (service.replace(certificate)) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(giftCertificateRepresentationAssembler.getLinksForUpdate(certificate));
-		}
 
-		Long createdId = service.create(certificate);
-		return createdId == null
-				? badRequestResponse(locale)
-				: ResponseEntity.status(HttpStatus.CREATED)
+		Long createdId = service.patchOrCreate(certificate);
+		return ResponseEntity.status(HttpStatus.CREATED)
 						.body(giftCertificateRepresentationAssembler.getLinksForCreate(createdId));
 	}
 
@@ -71,29 +64,20 @@ public class GiftCertificateController {
 	@PatchMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> patchGiftCertificates(
 			@PathVariable("id") long id, @RequestBody GiftCertificateDto certificate, Locale locale) {
-		if (certificate == null) {
-			return badRequestResponse(locale);
-		}
-		GiftCertificateDto original = service.getById(id);
-		if (original == null) {
-			return notFoundResponse(locale);
-		}
 
+		GiftCertificateDto original = service.getById(id);
 		certificate.setId(id);
-		return !service.replace(service.replaceAllNotNullParams(original, certificate))
-				? badRequestResponse(locale)
-				: ResponseEntity.status(HttpStatus.OK)
+		service.patch(service.replaceAllNotNullParams(original, certificate));
+
+		return ResponseEntity.status(HttpStatus.OK)
 						.body(giftCertificateRepresentationAssembler.getLinksForPatch(certificate));
 	}
 
 	@PreAuthorize("permitAll()")
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getGiftCertificate(@PathVariable("id") long id, Locale locale) {
-		GiftCertificateDto certificate = service.getById(id);
 
-		if (certificate == null) {
-			return notFoundResponse(locale);
-		}
+		GiftCertificateDto certificate = service.getById(id);
 
 		return ResponseEntity.status(HttpStatus.OK.value())
 				.body(
@@ -121,7 +105,7 @@ public class GiftCertificateController {
 		}
 
 		List<GiftCertificateDto> certificates =
-				service.selectAll(
+				service.getAll(
 						builder
 								.addNamePartCondition(nameFilter)
 								.addDescriptionPartCondition(descriptionFilter)
@@ -130,10 +114,6 @@ public class GiftCertificateController {
 						asc,
 						limit,
 						offset);
-
-		if (certificates == null) {
-			return badRequestResponse(locale);
-		}
 
 		CollectionWrapper<CollectionModel> result = new CollectionWrapper<>();
 		result.setCollection(
@@ -156,9 +136,8 @@ public class GiftCertificateController {
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
 	@DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> deleteGiftCertificate(@PathVariable("id") long id, Locale locale) {
-		return !service.delete(id)
-				? notFoundResponse(locale)
-				: ResponseEntity.status(HttpStatus.OK.value())
+		service.delete(id);
+		return ResponseEntity.status(HttpStatus.OK.value())
 						.body(giftCertificateRepresentationAssembler.getLinksForDelete(id));
 	}
 }

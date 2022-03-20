@@ -1,18 +1,18 @@
 package com.epam.esm.repository.compound.tag.impl;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.entity.User;
 import com.epam.esm.entity.purchase.Purchase;
 import com.epam.esm.repository.compound.tag.CustomTagRepository;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
 * Repository implementation of the {@code TagRepository} interface. Implements all operations, and

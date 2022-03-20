@@ -2,9 +2,12 @@ package com.epam.esm.web.controller.tag;
 
 import static com.epam.esm.web.utils.Utils.parsIntegerFromLong;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.exception.DuplicateEntityException;
+import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.service.implementation.TagServiceImpl;
 import com.epam.esm.web.controller.TagController;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -77,7 +80,7 @@ class TagControllerTest {
 			username = "user",
 			authorities = {"READ_ALL"})
 	void getNotExistingTagById() {
-		Mockito.when(tagService.getById(Mockito.anyLong())).thenReturn(null);
+		Mockito.when(tagService.getById(Mockito.anyLong())).thenThrow(new EntityNotExistException());
 
 		RestAssuredMockMvc.given().when().get(GET_BY_ID_PATH).then().statusCode(404);
 	}
@@ -87,7 +90,7 @@ class TagControllerTest {
 			username = "user",
 			authorities = {"READ_ALL"})
 	void getAllTags() {
-		Mockito.when(tagService.selectAll(anyLong(), anyLong())).thenReturn(List.of(dto, dto));
+		Mockito.when(tagService.getAll(anyLong(), anyLong())).thenReturn(List.of(dto, dto));
 
 		RestAssuredMockMvc.given()
 				.when()
@@ -103,7 +106,7 @@ class TagControllerTest {
 
 	@Test
 	void getAllTagsWithOutAuthorization() {
-		Mockito.when(tagService.selectAll(anyLong(), anyLong())).thenReturn(List.of(dto, dto));
+		Mockito.when(tagService.getAll(anyLong(), anyLong())).thenReturn(List.of(dto, dto));
 
 		RestAssuredMockMvc.given().when().get(GET_POPULAR_PATH).then().statusCode(403);
 	}
@@ -136,7 +139,7 @@ class TagControllerTest {
 			username = "user",
 			authorities = {"MODIFY_ALL"})
 	void deleteTag() {
-		Mockito.when(tagService.delete(Mockito.anyLong())).thenReturn(true);
+		Mockito.doNothing().when(tagService).delete(Mockito.anyLong());
 
 		RestAssuredMockMvc.given().when().delete("/tags/1").then().statusCode(200);
 	}
@@ -146,7 +149,7 @@ class TagControllerTest {
 			username = "user",
 			authorities = {"MODIFY_ALL"})
 	void deleteNotExistingTag() {
-		Mockito.when(tagService.delete(Mockito.anyLong())).thenReturn(false);
+		Mockito.doThrow(new EntityNotExistException()).when(tagService).delete(Mockito.anyLong());
 
 		RestAssuredMockMvc.given().when().delete(DELETE_PATH).then().statusCode(404);
 	}
@@ -154,15 +157,14 @@ class TagControllerTest {
 	@Test
 	@WithMockUser(username = "user")
 	void deleteTagWithOutAuthorities() {
-		Mockito.when(tagService.delete(Mockito.anyLong())).thenReturn(true);
+		Mockito.doNothing().when(tagService).delete(Mockito.anyLong());
 
 		RestAssuredMockMvc.given().when().delete(DELETE_PATH).then().statusCode(403);
 	}
 
 	@Test
 	void deleteTagWithOutAuthorization() {
-		Mockito.when(tagService.delete(Mockito.anyLong())).thenReturn(true);
-
+		Mockito.doNothing().when(tagService).delete(Mockito.anyLong());
 		RestAssuredMockMvc.given().when().delete(DELETE_PATH).then().statusCode(403);
 	}
 
@@ -187,7 +189,7 @@ class TagControllerTest {
 			username = "user",
 			authorities = {"WRITE_ALL"})
 	void failedCreateTag() {
-		Mockito.when(tagService.create(Mockito.any())).thenReturn(null);
+		Mockito.when(tagService.create(Mockito.any())).thenThrow(new DuplicateEntityException());
 
 		RestAssuredMockMvc.given()
 				.contentType("application/json")
@@ -195,13 +197,12 @@ class TagControllerTest {
 				.when()
 				.post(CREATE_PATH)
 				.then()
-				.statusCode(400);
+				.statusCode(409);
 	}
 
 	@Test
 	@WithMockUser(username = "user")
 	void createTagWithOutAuthorities() {
-		Mockito.when(tagService.delete(Mockito.anyLong())).thenReturn(true);
 
 		RestAssuredMockMvc.given()
 				.contentType("application/json")
@@ -214,7 +215,6 @@ class TagControllerTest {
 
 	@Test
 	void createTagWithOutAuthorization() {
-		Mockito.when(tagService.delete(Mockito.anyLong())).thenReturn(true);
 
 		RestAssuredMockMvc.given()
 				.contentType("application/json")

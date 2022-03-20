@@ -29,10 +29,6 @@ public class CertificateCriteriaBuilderServiceImpl implements CertificateCriteri
 		conditions = new ArrayList<>();
 	}
 
-	/**
-	* @param namePart {@code GiftCertificate} entity name part
-	* @return current state of {@code CertificateCriteriaBuilderService}
-	*/
 	@Override
 	public CertificateCriteriaBuilderService addNamePartCondition(String namePart) {
 		if (namePart != null) {
@@ -41,10 +37,6 @@ public class CertificateCriteriaBuilderServiceImpl implements CertificateCriteri
 		return this;
 	}
 
-	/**
-	* @param descriptionPart {@code GiftCertificate} entity description part
-	* @return current state of {@code CertificateCriteriaBuilderService}
-	*/
 	@Override
 	public CertificateCriteriaBuilderService addDescriptionPartCondition(String descriptionPart) {
 		if (descriptionPart != null) {
@@ -53,10 +45,6 @@ public class CertificateCriteriaBuilderServiceImpl implements CertificateCriteri
 		return this;
 	}
 
-	/**
-	* @param tagNames {@code GiftCertificate} entity must contain tag with this names
-	* @return current state of {@code CertificateCriteriaBuilderService}
-	*/
 	@Override
 	public CertificateCriteriaBuilderService addTagContainingCondition(List<String> tagNames) {
 		if (tagNames != null && !tagNames.isEmpty()) {
@@ -70,7 +58,6 @@ public class CertificateCriteriaBuilderServiceImpl implements CertificateCriteri
 		return this;
 	}
 
-	/** @return all conditions */
 	@Override
 	public List<ConfigurableFunction> getConditions() {
 		return conditions;

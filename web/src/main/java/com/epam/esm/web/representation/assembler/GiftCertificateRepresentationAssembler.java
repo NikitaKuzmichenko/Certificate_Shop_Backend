@@ -27,10 +27,12 @@ public class GiftCertificateRepresentationAssembler
 
 	@Override
 	public void addLinks(EntityModel<GiftCertificateViewDto> resource) {
-		if (resource.getContent() == null) {
-			return;
+
+		GiftCertificateViewDto dto = resource.getContent();
+		long id=0;
+		if(dto != null) {
+			id = dto.getId();
 		}
-		long id = resource.getContent().getId();
 
 		resource.add(
 				linkTo(methodOn(GiftCertificateController.class).getGiftCertificate(id, null))
@@ -42,7 +44,7 @@ public class GiftCertificateRepresentationAssembler
 				linkTo(methodOn(GiftCertificateController.class).patchGiftCertificates(id, null, null))
 						.withRel(PATCH_LINK_NAME));
 		resource.add(
-				linkTo(methodOn(GiftCertificateController.class).updateGiftCertificates(id, null, null))
+				linkTo(methodOn(GiftCertificateController.class).putGiftCertificates(id, null, null))
 						.withRel(UPDATE_LINK_NAME));
 		resource.add(
 				linkTo(methodOn(GiftCertificateController.class).deleteGiftCertificate(id, null))
@@ -72,7 +74,7 @@ public class GiftCertificateRepresentationAssembler
 				linkTo(methodOn(GiftCertificateController.class).deleteGiftCertificate(id, null))
 						.withRel(DELETE_LINK_NAME));
 		links.add(
-				linkTo(methodOn(GiftCertificateController.class).updateGiftCertificates(id, null, null))
+				linkTo(methodOn(GiftCertificateController.class).putGiftCertificates(id, null, null))
 						.withRel(UPDATE_LINK_NAME));
 		links.add(
 				linkTo(methodOn(GiftCertificateController.class).getGiftCertificate(id, null))
@@ -93,7 +95,7 @@ public class GiftCertificateRepresentationAssembler
 		links.add(
 				linkTo(
 								methodOn(GiftCertificateController.class)
-										.updateGiftCertificates(id, certificate, null))
+										.putGiftCertificates(id, certificate, null))
 						.withSelfRel());
 		links.add(
 				linkTo(methodOn(GiftCertificateController.class).createGiftCertificate(null, null))
@@ -136,7 +138,7 @@ public class GiftCertificateRepresentationAssembler
 		links.add(
 				linkTo(
 								methodOn(GiftCertificateController.class)
-										.updateGiftCertificates(id, certificate, null))
+										.putGiftCertificates(id, certificate, null))
 						.withRel(UPDATE_LINK_NAME));
 		links.add(
 				linkTo(methodOn(GiftCertificateController.class).getGiftCertificate(id, null))

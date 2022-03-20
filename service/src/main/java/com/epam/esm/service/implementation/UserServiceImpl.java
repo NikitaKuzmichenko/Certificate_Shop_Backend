@@ -3,6 +3,9 @@ package com.epam.esm.service.implementation;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.mapper.UserDtoMapper;
 import com.epam.esm.entity.User;
+import com.epam.esm.exception.BadInputException;
+import com.epam.esm.exception.DuplicateEntityException;
+import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.pagination.OffsetLimitPage;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.repository.UserRoleRepository;
@@ -11,9 +14,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -54,7 +57,11 @@ public class UserServiceImpl implements UserService {
 							.map(Optional::get)
 							.collect(Collectors.toList()));
 		}
-		return repository.save(savedUser).getId();
+		try {
+			return repository.save(savedUser).getId();
+		} catch (DataIntegrityViolationException e) {
+			throw new DuplicateEntityException();
+		}
 	}
 
 	@Override
@@ -63,43 +70,26 @@ public class UserServiceImpl implements UserService {
 		return create(user);
 	}
 
-	/**
-	* @param id PK of the element to return
-	* @return the element with the specified PK in this database
-	*/
 	@Override
 	public UserDto getById(long id) {
-		return UserDtoMapper.mapUserToDto(repository.findById(id).orElse(null));
+		return UserDtoMapper.mapUserToDto(
+				repository.findById(id).orElseThrow(EntityNotExistException::new));
 	}
 
 	@Override
 	public UserDto getByEmail(String email) {
 		if (email == null) {
-			return null;
+			throw new BadInputException();
 		}
-		return UserDtoMapper.mapUserToDto(repository.findByEmail(email).orElse(null));
+		return UserDtoMapper.mapUserToDto(
+				repository.findByEmail(email).orElseThrow(EntityNotExistException::new));
 	}
 
-	/** @return elements in this database, if database empty return empty list */
-	@Override
-	public List<UserDto> getAll() {
-		return StreamSupport.stream(repository.findAll().spliterator(), false)
-				.map(UserDtoMapper::mapUserToDto)
-				.collect(Collectors.toList());
-	}
-
-	/**
-	* @param limit max amount of elements in result list
-	* @param offset elements skipped before reading
-	* @return elements in this database, if database empty return empty list
-	* @throws IllegalArgumentException if limit or offset is negative
-	*/
 	@Override
 	public List<UserDto> getAll(long limit, long offset) {
 		if (limit < 0 || offset < 0) {
-			throw new IllegalArgumentException("limit or offset is negative");
+			throw new BadInputException();
 		}
-
 		return repository.findAll(new OffsetLimitPage((int) limit, (int) offset)).toList().stream()
 				.map(UserDtoMapper::mapUserToDto)
 				.collect(Collectors.toList());

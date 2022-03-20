@@ -7,6 +7,8 @@ import java.util.*;
 
 public class UserRoleDtoMapper {
 
+	private UserRoleDtoMapper(){}
+
 	public static UserRoleDto mapUserRoleToDto(UserRole entity) {
 		if (entity == null) {
 			return null;

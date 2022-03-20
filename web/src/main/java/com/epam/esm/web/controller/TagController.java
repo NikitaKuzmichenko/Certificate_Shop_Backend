@@ -1,16 +1,10 @@
 package com.epam.esm.web.controller;
 
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.badRequestResponse;
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.notFoundResponse;
-
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.implementation.TagServiceImpl;
 import com.epam.esm.web.representation.assembler.TagRepresentationAssembler;
 import com.epam.esm.web.representation.dto.collection.CollectionWrapper;
 import com.epam.esm.web.representation.dto.mapper.TagViewDtoMapper;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -18,6 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @RequestMapping("/tags")
 @RestController
@@ -34,9 +32,7 @@ public class TagController {
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getTag(@PathVariable("id") long id, Locale locale) {
 		TagDto tag = service.getById(id);
-		return tag == null
-				? notFoundResponse(locale)
-				: ResponseEntity.status(HttpStatus.OK.value())
+		return ResponseEntity.status(HttpStatus.OK.value())
 						.body(tagRepresentationAssembler.toModel(TagViewDtoMapper.toViewDto(tag)));
 	}
 
@@ -45,9 +41,7 @@ public class TagController {
 	public ResponseEntity<?> getPopularTag(Locale locale) {
 
 		TagDto tag = service.getPopular();
-		return tag == null
-				? notFoundResponse(locale)
-				: ResponseEntity.status(HttpStatus.OK.value())
+		return ResponseEntity.status(HttpStatus.OK.value())
 						.body(tagRepresentationAssembler.toModel(TagViewDtoMapper.toViewDto(tag)));
 	}
 
@@ -65,11 +59,7 @@ public class TagController {
 			limit = DEFAULT_LIMIT;
 		}
 
-		List<TagDto> tags = service.selectAll(limit, offset);
-
-		if (tags == null) {
-			return badRequestResponse(locale);
-		}
+		List<TagDto> tags = service.getAll(limit, offset);
 
 		CollectionWrapper<CollectionModel> result = new CollectionWrapper<>();
 		result.setCollection(
@@ -88,18 +78,17 @@ public class TagController {
 	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createTag(@RequestBody TagDto tag, Locale locale) {
 		Long id = service.create(tag);
-		return id == null
-				? badRequestResponse(locale)
-				: ResponseEntity.status(HttpStatus.CREATED.value())
+
+		return ResponseEntity.status(HttpStatus.CREATED.value())
 						.body(tagRepresentationAssembler.getLinksForCreate(id));
 	}
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
 	@DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "{id}")
 	public ResponseEntity<?> deleteTag(@PathVariable("id") long id, Locale locale) {
-		return !service.delete(id)
-				? notFoundResponse(locale)
-				: ResponseEntity.status(HttpStatus.OK.value())
+		service.delete(id);
+
+		return ResponseEntity.status(HttpStatus.OK.value())
 						.body(tagRepresentationAssembler.getLinksForDelete(id));
 	}
 }

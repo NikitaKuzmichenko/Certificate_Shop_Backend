@@ -2,15 +2,21 @@ package com.epam.esm.service.implementation;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.mapper.TagDtoMapper;
+import com.epam.esm.exception.BadInputException;
+import com.epam.esm.exception.DuplicateEntityException;
+import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.pagination.OffsetLimitPage;
 import com.epam.esm.repository.compound.tag.TagRepository;
 import com.epam.esm.service.TagService;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import javax.persistence.NoResultException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -29,55 +35,41 @@ public class TagServiceImpl implements TagService {
 		this.repository = repository;
 	}
 
-	/**
-	* @param tag element to be appended to repository
-	* @return PK of inserted element, or {@code null} if value can not be inserted
-	*/
 	@Override
 	public Long create(@Valid TagDto tag) {
-		return TagDtoMapper.mapTagToDto(repository.save(TagDtoMapper.getTagFromDto(tag))).getId();
+		try {
+			return TagDtoMapper.mapTagToDto(repository.save(TagDtoMapper.getTagFromDto(tag))).getId();
+		} catch (DataIntegrityViolationException e) {
+			throw new DuplicateEntityException();
+		}
 	}
 
-	/**
-	* @param id PK of the element to return
-	* @return the element with the specified PK in this repository
-	*/
 	@Override
 	public TagDto getById(long id) {
-		return TagDtoMapper.mapTagToDto(repository.findById(id).orElse(null));
+		return TagDtoMapper.mapTagToDto(
+				repository.findById(id).orElseThrow(EntityNotExistException::new));
 	}
 
-	/**
-	* @param name name of the element to return
-	* @return the element with the specified PK in this repository
-	*/
 	@Override
 	public TagDto getByName(String name) {
-		return name == null ? null : TagDtoMapper.mapTagToDto(repository.findByName(name).orElse(null));
-	}
-
-	/**
-	* @param id if repository containing element with this id - it will be removed from this
-	*     repository
-	* @return {@code true} if operation vas successful, else return {@code false}
-	*/
-	@Override
-	public boolean delete(long id) {
-		TagDto tag = getById(id);
-		if (tag == null) {
-			return false;
+		if (name == null) {
+			throw new BadInputException();
 		}
-		repository.delete(TagDtoMapper.getTagFromDto(tag));
-		return true;
+		return TagDtoMapper.mapTagToDto(
+				repository.findByName(name).orElseThrow(EntityNotExistException::new));
 	}
 
-	/**
-	* Reattach tags from this repository to gift certificate with given id
-	*
-	* @param tags tags will be reattached to this element, if existing else they will be created
-	*/
+	@Override
+	public void delete(long id) {
+		TagDto tag = getById(id);
+		repository.delete(TagDtoMapper.getTagFromDto(tag));
+	}
+
 	@Override
 	public Set<TagDto> persistTags(Set<@Valid TagDto> tags) {
+		if(tags == null || tags.isEmpty()){
+			return new HashSet<>();
+		}
 		return repository
 				.persistTags(tags.stream().map(TagDtoMapper::getTagFromDto).collect(Collectors.toSet()))
 				.stream()
@@ -85,30 +77,19 @@ public class TagServiceImpl implements TagService {
 				.collect(Collectors.toSet());
 	}
 
-	/** @return Get the most widely used tag of a user with the highest cost of all orders */
 	@Override
 	public TagDto getPopular() {
-		return TagDtoMapper.mapTagToDto(repository.getPopular());
+		try {
+			return TagDtoMapper.mapTagToDto(repository.getPopular());
+		} catch (NoResultException e) {
+			throw new EntityNotExistException();
+		}
 	}
 
-	/** @return all element in this database, if database empty return empty list */
 	@Override
-	public List<TagDto> selectAll() {
-		return StreamSupport.stream(repository.findAll().spliterator(), false)
-				.map(TagDtoMapper::mapTagToDto)
-				.collect(Collectors.toList());
-	}
-
-	/**
-	* @param limit max amount of elements in result list
-	* @param offset elements skipped before reading
-	* @return element in this database, if database empty return empty list
-	* @throws IllegalArgumentException if limit or offset is negative
-	*/
-	@Override
-	public List<TagDto> selectAll(long limit, long offset) {
+	public List<TagDto> getAll(long limit, long offset) {
 		if (limit < 0 || offset < 0) {
-			throw new IllegalArgumentException("limit or offset is negative");
+			throw new BadInputException();
 		}
 		return repository.findAll(new OffsetLimitPage((int) limit, (int) offset)).stream()
 				.map(TagDtoMapper::mapTagToDto)

@@ -21,7 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-public class UserDetailsServiceTest {
+class UserDetailsServiceTest {
 
 	@Mock private static final UserService userService = mock(UserService.class);
 
