@@ -1,17 +1,16 @@
 package com.epam.esm.service.implementation;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.CertificateCriteriaBuilderService;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-
-import java.util.List;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class CertificateCriteriaBuilderServiceImplTest {
 	@Mock public static final TagServiceImpl tagService = mock(TagServiceImpl.class);

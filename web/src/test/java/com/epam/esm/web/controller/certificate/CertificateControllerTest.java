@@ -79,7 +79,8 @@ class CertificateControllerTest {
 
 	@Test
 	void getNotExistingCertificateById() {
-		Mockito.when(giftCertificateService.getById(Mockito.anyLong())).thenThrow(new EntityNotExistException());
+		Mockito.when(giftCertificateService.getById(Mockito.anyLong()))
+				.thenThrow(new EntityNotExistException());
 
 		RestAssuredMockMvc.given().when().get(GET_BY_ID_PATH).then().statusCode(404);
 	}
@@ -231,7 +232,9 @@ class CertificateControllerTest {
 			username = "user",
 			authorities = {"MODIFY_ALL"})
 	void deleteNotExistingCertificate() {
-		Mockito.doThrow(new EntityNotExistException()).when(giftCertificateService).delete(Mockito.anyLong());
+		Mockito.doThrow(new EntityNotExistException())
+				.when(giftCertificateService)
+				.delete(Mockito.anyLong());
 		RestAssuredMockMvc.given().when().delete(DELETE_PATH).then().statusCode(404);
 	}
 
@@ -271,7 +274,8 @@ class CertificateControllerTest {
 			username = "user",
 			authorities = {"WRITE_ALL"})
 	void failedCreateCertificate() {
-		Mockito.when(giftCertificateService.create(Mockito.any())).thenThrow(new DuplicateEntityException());
+		Mockito.when(giftCertificateService.create(Mockito.any()))
+				.thenThrow(new DuplicateEntityException());
 
 		RestAssuredMockMvc.given()
 				.contentType("application/json")

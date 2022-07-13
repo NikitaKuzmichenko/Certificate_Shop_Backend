@@ -29,8 +29,8 @@ public class GiftCertificateRepresentationAssembler
 	public void addLinks(EntityModel<GiftCertificateViewDto> resource) {
 
 		GiftCertificateViewDto dto = resource.getContent();
-		long id=0;
-		if(dto != null) {
+		long id = 0;
+		if (dto != null) {
 			id = dto.getId();
 		}
 
@@ -93,9 +93,7 @@ public class GiftCertificateRepresentationAssembler
 		long id = certificate.getId();
 		List<Link> links = new ArrayList<>();
 		links.add(
-				linkTo(
-								methodOn(GiftCertificateController.class)
-										.putGiftCertificates(id, certificate, null))
+				linkTo(methodOn(GiftCertificateController.class).putGiftCertificates(id, certificate, null))
 						.withSelfRel());
 		links.add(
 				linkTo(methodOn(GiftCertificateController.class).createGiftCertificate(null, null))
@@ -136,9 +134,7 @@ public class GiftCertificateRepresentationAssembler
 				linkTo(methodOn(GiftCertificateController.class).deleteGiftCertificate(id, null))
 						.withRel(DELETE_LINK_NAME));
 		links.add(
-				linkTo(
-								methodOn(GiftCertificateController.class)
-										.putGiftCertificates(id, certificate, null))
+				linkTo(methodOn(GiftCertificateController.class).putGiftCertificates(id, certificate, null))
 						.withRel(UPDATE_LINK_NAME));
 		links.add(
 				linkTo(methodOn(GiftCertificateController.class).getGiftCertificate(id, null))

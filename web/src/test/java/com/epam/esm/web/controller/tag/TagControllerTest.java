@@ -2,7 +2,6 @@ package com.epam.esm.web.controller.tag;
 
 import static com.epam.esm.web.utils.Utils.parsIntegerFromLong;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 import com.epam.esm.dto.TagDto;

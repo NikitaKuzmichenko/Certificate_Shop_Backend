@@ -16,7 +16,6 @@ import com.epam.esm.repository.compound.certificate.impl.function.ConfigurableFu
 import com.epam.esm.repository.compound.certificate.impl.function.DescriptionPartCondition;
 import com.epam.esm.service.CertificateCriteriaBuilderService;
 import com.epam.esm.service.TagService;
-import com.epam.esm.service.implementation.GiftCertificateServiceImpl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -40,8 +39,8 @@ import org.springframework.data.domain.Pageable;
 
 public class GiftCertificateServiceImplTest {
 	@Mock
-	public static final CertificateCriteriaBuilderService criteriaBuilder
-			= mock(CertificateCriteriaBuilderService.class);
+	public static final CertificateCriteriaBuilderService criteriaBuilder =
+			mock(CertificateCriteriaBuilderService.class);
 
 	@Mock
 	public static final GiftCertificateRepository repository = mock(GiftCertificateRepository.class);
@@ -59,12 +58,10 @@ public class GiftCertificateServiceImplTest {
 	@BeforeAll
 	public static void initAll() {
 		ZonedDateTime creationDate =
-				LocalDateTime.of(2021, 12, 4, 0, 0, 0)
-                        .atZone(ZoneId.systemDefault());
+				LocalDateTime.of(2021, 12, 4, 0, 0, 0).atZone(ZoneId.systemDefault());
 
 		ZonedDateTime creationDate2 =
-				LocalDateTime.of(2021, 12, 4, 1, 0, 0)
-                        .atZone(ZoneId.systemDefault());
+				LocalDateTime.of(2021, 12, 4, 1, 0, 0).atZone(ZoneId.systemDefault());
 
 		List<Tag> tags = new ArrayList<>();
 
@@ -109,7 +106,7 @@ public class GiftCertificateServiceImplTest {
 	@Test
 	void getNotExistingGiftCertificateById() {
 		when(repository.findById(anyLong())).thenReturn(Optional.empty());
-		Assertions.assertThrows(EntityNotExistException.class,()->service.getById(1));
+		Assertions.assertThrows(EntityNotExistException.class, () -> service.getById(1));
 	}
 
 	@Test
@@ -121,7 +118,8 @@ public class GiftCertificateServiceImplTest {
 	@Test
 	void failedCreateCertificate() {
 		when(repository.save(anyObject())).thenThrow(new DuplicateKeyException(""));
-		Assertions.assertThrows(DuplicateEntityException.class, () -> service.create(giftCertificateDto));
+		Assertions.assertThrows(
+				DuplicateEntityException.class, () -> service.create(giftCertificateDto));
 	}
 
 	@Test
@@ -135,7 +133,8 @@ public class GiftCertificateServiceImplTest {
 	void failedUpdateCertificate() {
 		when(repository.save(anyObject())).thenThrow(new DuplicateKeyException(""));
 		when(repository.findById(anyLong())).thenReturn(Optional.of(giftCertificate));
-		Assertions.assertThrows(DuplicateEntityException.class, () -> service.patch(giftCertificateDto));
+		Assertions.assertThrows(
+				DuplicateEntityException.class, () -> service.patch(giftCertificateDto));
 	}
 
 	@Test
@@ -149,19 +148,20 @@ public class GiftCertificateServiceImplTest {
 	void failedUpdateOrCreateCertificate() {
 		when(repository.save(anyObject())).thenThrow(new DuplicateKeyException(""));
 		when(repository.findById(anyLong())).thenReturn(Optional.of(giftCertificate));
-		Assertions.assertThrows(DuplicateEntityException.class, () -> service.patchOrCreate(giftCertificateDto));
+		Assertions.assertThrows(
+				DuplicateEntityException.class, () -> service.patchOrCreate(giftCertificateDto));
 	}
 
 	@Test
 	void deleteCertificate() {
 		when(repository.findById(anyLong())).thenReturn(Optional.of(giftCertificate));
-		Assertions.assertDoesNotThrow(()->service.delete(1));
+		Assertions.assertDoesNotThrow(() -> service.delete(1));
 	}
 
 	@Test
 	void failedDeleteCertificate() {
 		when(repository.findById(anyLong())).thenReturn(Optional.empty());
-		Assertions.assertThrows(EntityNotExistException.class,()->service.delete(1));
+		Assertions.assertThrows(EntityNotExistException.class, () -> service.delete(1));
 	}
 
 	@Test
@@ -171,15 +171,14 @@ public class GiftCertificateServiceImplTest {
 				giftCertificates.stream()
 						.map(GiftCertificateDtoMapper::mapGiftCertificateToDto)
 						.collect(Collectors.toList()),
-				service.getAll(1,1));
+				service.getAll(1, 1));
 	}
 
 	@ParameterizedTest
 	@CsvSource({"-1,-1", "-1,1", "1,-1"})
-	void getAllUserWitchIncorrectLimitAndOffset(int limit,int offset) {
+	void getAllUserWitchIncorrectLimitAndOffset(int limit, int offset) {
 		when(repository.findAll((Pageable) anyObject())).thenReturn(new PageImpl<>(giftCertificates));
-		Assertions.assertThrows(BadInputException.class,
-				()->service.getAll(limit, offset));
+		Assertions.assertThrows(BadInputException.class, () -> service.getAll(limit, offset));
 	}
 
 	@Test
@@ -187,14 +186,14 @@ public class GiftCertificateServiceImplTest {
 		List<ConfigurableFunction> functions = new ArrayList<>();
 		functions.add(new DescriptionPartCondition("1"));
 
-		when(repository.getAll(anyList(),anyLong(),anyLong())).thenReturn(giftCertificates);
+		when(repository.getAll(anyList(), anyLong(), anyLong())).thenReturn(giftCertificates);
 		when(criteriaBuilder.getConditions()).thenReturn(functions);
 
 		Assertions.assertEquals(
 				giftCertificates.stream()
 						.map(GiftCertificateDtoMapper::mapGiftCertificateToDto)
 						.collect(Collectors.toList()),
-				service.getAll(criteriaBuilder,1,1));
+				service.getAll(criteriaBuilder, 1, 1));
 	}
 
 	@Test
@@ -205,7 +204,7 @@ public class GiftCertificateServiceImplTest {
 				giftCertificates.stream()
 						.map(GiftCertificateDtoMapper::mapGiftCertificateToDto)
 						.collect(Collectors.toList()),
-				service.getAll(criteriaBuilder,1,1));
+				service.getAll(criteriaBuilder, 1, 1));
 	}
 
 	@Test
@@ -215,45 +214,45 @@ public class GiftCertificateServiceImplTest {
 				giftCertificates.stream()
 						.map(GiftCertificateDtoMapper::mapGiftCertificateToDto)
 						.collect(Collectors.toList()),
-				service.getAll(null,1,1));
+				service.getAll(null, 1, 1));
 	}
 
 	@ParameterizedTest
 	@CsvSource({"-1,-1", "-1,1", "1,-1"})
-	void getAllWithCriteriaWitchIncorrectLimitAndOffset(int limit,int offset) {
+	void getAllWithCriteriaWitchIncorrectLimitAndOffset(int limit, int offset) {
 		when(repository.findAll((Pageable) anyObject())).thenReturn(new PageImpl<>(giftCertificates));
-		Assertions.assertThrows(BadInputException.class,
-				()->service.getAll(limit, offset));
+		Assertions.assertThrows(BadInputException.class, () -> service.getAll(limit, offset));
 	}
 
 	@Test
 	void getAllWithSort() {
-		when(repository.getAll(anyString(),anyBoolean(),anyLong(),anyLong())).thenReturn(giftCertificates);
+		when(repository.getAll(anyString(), anyBoolean(), anyLong(), anyLong()))
+				.thenReturn(giftCertificates);
 
 		Assertions.assertEquals(
 				giftCertificates.stream()
 						.map(GiftCertificateDtoMapper::mapGiftCertificateToDto)
 						.collect(Collectors.toList()),
-				service.getAll("1",true,1,1));
+				service.getAll("1", true, 1, 1));
 	}
 
 	@Test
 	void getAllWithNullSort() {
-		when(repository.getAll(anyString(),anyBoolean(),anyLong(),anyLong())).thenReturn(giftCertificates);
+		when(repository.getAll(anyString(), anyBoolean(), anyLong(), anyLong()))
+				.thenReturn(giftCertificates);
 		when(repository.findAll((Pageable) anyObject())).thenReturn(new PageImpl<>(giftCertificates));
 
 		Assertions.assertEquals(
 				giftCertificates.stream()
 						.map(GiftCertificateDtoMapper::mapGiftCertificateToDto)
 						.collect(Collectors.toList()),
-				service.getAll(null,true,1,1));
+				service.getAll(null, true, 1, 1));
 	}
 
 	@ParameterizedTest
 	@CsvSource({"-1,-1", "-1,1", "1,-1"})
-	void getAllWithSortWitchIncorrectLimitAndOffset(int limit,int offset) {
+	void getAllWithSortWitchIncorrectLimitAndOffset(int limit, int offset) {
 		when(repository.findAll((Pageable) anyObject())).thenReturn(new PageImpl<>(giftCertificates));
-		Assertions.assertThrows(BadInputException.class,
-				()->service.getAll(limit, offset));
+		Assertions.assertThrows(BadInputException.class, () -> service.getAll(limit, offset));
 	}
 }

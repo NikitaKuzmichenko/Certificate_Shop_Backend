@@ -80,11 +80,9 @@ public class OrderServiceImpl implements OrderService {
 
 		try {
 			return orderRepository.save(order).getId();
-		}
-		catch (DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DuplicateEntityException();
 		}
-
 	}
 
 	@Override

@@ -6,6 +6,10 @@ import com.epam.esm.service.UserService;
 import com.epam.esm.web.representation.assembler.UserRepresentationAssembler;
 import com.epam.esm.web.representation.dto.collection.CollectionWrapper;
 import com.epam.esm.web.representation.dto.mapper.UserViewDtoMapper;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -13,11 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RequestMapping("/users")
 @RestController
@@ -37,7 +36,7 @@ public class UserController {
 	public ResponseEntity<?> getUser(@PathVariable("id") long id, Locale locale) {
 		UserDto user = userService.getById(id);
 		return ResponseEntity.status(HttpStatus.OK.value())
-						.body(userRepresentationAssembler.toModel(UserViewDtoMapper.toViewDto(user)));
+				.body(userRepresentationAssembler.toModel(UserViewDtoMapper.toViewDto(user)));
 	}
 
 	@PreAuthorize("hasAuthority('READ_ALL')")
@@ -76,6 +75,6 @@ public class UserController {
 		user.setRoles(DEFAULT_ROLES);
 		Long id = userService.createAndEncodePassword(user);
 		return ResponseEntity.status(HttpStatus.CREATED.value())
-						.body(userRepresentationAssembler.getLinksForCreate(id));
+				.body(userRepresentationAssembler.getLinksForCreate(id));
 	}
 }

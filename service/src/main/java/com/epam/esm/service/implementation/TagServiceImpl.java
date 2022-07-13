@@ -8,7 +8,6 @@ import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.pagination.OffsetLimitPage;
 import com.epam.esm.repository.compound.tag.TagRepository;
 import com.epam.esm.service.TagService;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +66,7 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	public Set<TagDto> persistTags(Set<@Valid TagDto> tags) {
-		if(tags == null || tags.isEmpty()){
+		if (tags == null || tags.isEmpty()) {
 			return new HashSet<>();
 		}
 		return repository

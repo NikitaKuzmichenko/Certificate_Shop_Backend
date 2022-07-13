@@ -1,12 +1,10 @@
 package com.epam.esm.service.security.entity;
 
 import java.util.Collection;
-
-import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-@EqualsAndHashCode
+// @EqualsAndHashCode
 public class CustomUserDetails extends User {
 
 	private long userId;

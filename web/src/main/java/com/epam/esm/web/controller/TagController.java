@@ -5,6 +5,9 @@ import com.epam.esm.service.implementation.TagServiceImpl;
 import com.epam.esm.web.representation.assembler.TagRepresentationAssembler;
 import com.epam.esm.web.representation.dto.collection.CollectionWrapper;
 import com.epam.esm.web.representation.dto.mapper.TagViewDtoMapper;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -12,10 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @RequestMapping("/tags")
 @RestController
@@ -33,7 +32,7 @@ public class TagController {
 	public ResponseEntity<?> getTag(@PathVariable("id") long id, Locale locale) {
 		TagDto tag = service.getById(id);
 		return ResponseEntity.status(HttpStatus.OK.value())
-						.body(tagRepresentationAssembler.toModel(TagViewDtoMapper.toViewDto(tag)));
+				.body(tagRepresentationAssembler.toModel(TagViewDtoMapper.toViewDto(tag)));
 	}
 
 	@PreAuthorize("hasAuthority('READ_ALL')")
@@ -42,7 +41,7 @@ public class TagController {
 
 		TagDto tag = service.getPopular();
 		return ResponseEntity.status(HttpStatus.OK.value())
-						.body(tagRepresentationAssembler.toModel(TagViewDtoMapper.toViewDto(tag)));
+				.body(tagRepresentationAssembler.toModel(TagViewDtoMapper.toViewDto(tag)));
 	}
 
 	@PreAuthorize("hasAuthority('READ_ALL')")
@@ -80,7 +79,7 @@ public class TagController {
 		Long id = service.create(tag);
 
 		return ResponseEntity.status(HttpStatus.CREATED.value())
-						.body(tagRepresentationAssembler.getLinksForCreate(id));
+				.body(tagRepresentationAssembler.getLinksForCreate(id));
 	}
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
@@ -89,6 +88,6 @@ public class TagController {
 		service.delete(id);
 
 		return ResponseEntity.status(HttpStatus.OK.value())
-						.body(tagRepresentationAssembler.getLinksForDelete(id));
+				.body(tagRepresentationAssembler.getLinksForDelete(id));
 	}
 }

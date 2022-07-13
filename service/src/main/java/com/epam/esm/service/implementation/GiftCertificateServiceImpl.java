@@ -11,17 +11,16 @@ import com.epam.esm.repository.compound.certificate.GiftCertificateRepository;
 import com.epam.esm.service.CertificateCriteriaBuilderService;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 /**
 * Service implementation of the {@code GiftCertificateService} interface. Implements all
@@ -54,8 +53,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 			return repository
 					.save(GiftCertificateDtoMapper.getGiftCertificateFromDto(giftCertificate))
 					.getId();
-		}
-		catch (DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DuplicateEntityException();
 		}
 	}
@@ -73,8 +71,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 			return repository
 					.save(GiftCertificateDtoMapper.getGiftCertificateFromDto(giftCertificate))
 					.getId();
-		}
-		catch (DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DuplicateEntityException();
 		}
 	}

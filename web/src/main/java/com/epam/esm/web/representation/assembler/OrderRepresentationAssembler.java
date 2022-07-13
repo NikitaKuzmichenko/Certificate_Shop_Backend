@@ -25,7 +25,7 @@ public class OrderRepresentationAssembler
 	public void addLinks(EntityModel<OrderViewDto> resource) {
 		long orderId = 0;
 		OrderViewDto dto = resource.getContent();
-		if(dto != null) {
+		if (dto != null) {
 			orderId = dto.getId();
 
 			if (dto.getPurchases() != null && !dto.getPurchases().isEmpty()) {

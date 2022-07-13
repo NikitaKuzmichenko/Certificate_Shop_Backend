@@ -1,5 +1,11 @@
 package com.epam.esm.service.implementation;
 
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.mapper.UserDtoMapper;
 import com.epam.esm.entity.User;
@@ -9,6 +15,9 @@ import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.repository.UserRoleRepository;
 import com.epam.esm.service.UserService;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,16 +30,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class UserServiceImplTest {
 
@@ -59,38 +58,32 @@ public class UserServiceImplTest {
 	@AfterEach
 	public void resetMocks() {
 		testUserDto = UserDtoMapper.mapUserToDto(testUser);
-		Mockito.reset(userRepository, roleRepository,passwordEncoder);
+		Mockito.reset(userRepository, roleRepository, passwordEncoder);
 	}
 
 	@Test
 	void createUser() {
 		when(userRepository.save(anyObject())).thenReturn(testUser);
-		Assertions.assertEquals(
-				testUser.getId(), userService.create(testUserDto));
+		Assertions.assertEquals(testUser.getId(), userService.create(testUserDto));
 	}
 
 	@Test
 	void failedToCreateUser() {
 		when(userRepository.save(anyObject())).thenThrow(new DuplicateKeyException(""));
-		Assertions.assertThrows(
-				DuplicateEntityException.class,
-				() -> userService.create(testUserDto));
+		Assertions.assertThrows(DuplicateEntityException.class, () -> userService.create(testUserDto));
 	}
 
 	@Test
 	void createUserAndEncodePassword() {
 		when(userRepository.save(anyObject())).thenReturn(testUser);
-		Assertions.assertEquals(
-				testUser.getId(),
-				userService.createAndEncodePassword(testUserDto));
+		Assertions.assertEquals(testUser.getId(), userService.createAndEncodePassword(testUserDto));
 	}
 
 	@Test
 	void failedToCreateUserAndEncodePassword() {
 		when(userRepository.save(anyObject())).thenThrow(new DuplicateKeyException(""));
 		Assertions.assertThrows(
-				DuplicateEntityException.class,
-				() -> userService.createAndEncodePassword(testUserDto));
+				DuplicateEntityException.class, () -> userService.createAndEncodePassword(testUserDto));
 	}
 
 	@Test
@@ -102,25 +95,26 @@ public class UserServiceImplTest {
 	@Test
 	void getNotExistingUserById() {
 		when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-		Assertions.assertThrows(EntityNotExistException.class,()->userService.getById(anyLong()));
+		Assertions.assertThrows(EntityNotExistException.class, () -> userService.getById(anyLong()));
 	}
 
 	@Test
-	void getUserByEmail(){
+	void getUserByEmail() {
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(testUser));
-		Assertions.assertEquals(testUserDto,userService.getByEmail(anyString()));
+		Assertions.assertEquals(testUserDto, userService.getByEmail(anyString()));
 	}
 
 	@Test
-	void getUserByNullEmail(){
+	void getUserByNullEmail() {
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(testUser));
-		Assertions.assertThrows(BadInputException.class,()->userService.getByEmail(null));
+		Assertions.assertThrows(BadInputException.class, () -> userService.getByEmail(null));
 	}
 
 	@Test
-	void getNotExistingUserByEmail(){
+	void getNotExistingUserByEmail() {
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-		Assertions.assertThrows(EntityNotExistException.class,()->userService.getByEmail(anyString()));
+		Assertions.assertThrows(
+				EntityNotExistException.class, () -> userService.getByEmail(anyString()));
 	}
 
 	@Test
@@ -134,10 +128,9 @@ public class UserServiceImplTest {
 
 	@ParameterizedTest
 	@CsvSource({"-1,-1", "-1,1", "1,-1"})
-	void getAllUserWitchIncorrectLimitAndOffset(int limit,int offset) {
+	void getAllUserWitchIncorrectLimitAndOffset(int limit, int offset) {
 		List<User> users = List.of(testUser, testUser);
 		when(userRepository.findAll((Pageable) anyObject())).thenReturn(new PageImpl<>(users));
-		Assertions.assertThrows(BadInputException.class,
-				()->userService.getAll(limit, offset));
+		Assertions.assertThrows(BadInputException.class, () -> userService.getAll(limit, offset));
 	}
 }

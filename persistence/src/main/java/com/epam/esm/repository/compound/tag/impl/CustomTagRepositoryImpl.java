@@ -3,16 +3,15 @@ package com.epam.esm.repository.compound.tag.impl;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.purchase.Purchase;
 import com.epam.esm.repository.compound.tag.CustomTagRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * Repository implementation of the {@code TagRepository} interface. Implements all operations, and
@@ -22,9 +21,7 @@ import java.util.Set;
 @Component
 public class CustomTagRepositoryImpl implements CustomTagRepository {
 	private static final String USER_WITH_MAX_SPENDING =
-			" select o from Purchase o"
-					+ " group by o.id"
-					+ " order by sum(o.price) desc";
+			" select o from Purchase o" + " group by o.id" + " order by sum(o.price) desc";
 
 	private static final String TEMP_USER = "user";
 

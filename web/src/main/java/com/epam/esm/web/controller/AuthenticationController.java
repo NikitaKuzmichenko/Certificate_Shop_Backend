@@ -1,10 +1,13 @@
 package com.epam.esm.web.controller;
 
+import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.tokenExpiredResponse;
+
 import com.epam.esm.dto.RefreshTokenDto;
 import com.epam.esm.service.RefreshTokenService;
 import com.epam.esm.service.UserService;
 import com.epam.esm.web.security.token.jwt.JwtTokenManager;
 import com.epam.esm.web.security.token.refresh.RefreshTokenManager;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,10 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Locale;
-
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.tokenExpiredResponse;
 
 @RestController
 public class AuthenticationController {

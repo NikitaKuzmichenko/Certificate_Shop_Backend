@@ -30,7 +30,7 @@ public interface RefreshTokenService {
 	RefreshTokenDto getByUserEmail(String email);
 
 	/**
-	* @param id  entity of the {@code User} class
+	* @param id entity of the {@code User} class
 	* @return entity with the specified PK in this repository
 	* @throws EntityNotExistException if entity with this id do not exist in repository
 	*/

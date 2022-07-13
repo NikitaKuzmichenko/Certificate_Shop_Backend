@@ -82,19 +82,19 @@ test {
     useJUnitPlatform()
 }
 
-//spotless {
-//
-//    java {
-//        target fileTree('.') {
-//            include '**/*.java'
-//            exclude '**/build/**', '**/build-*/**'
-//        }
-//
-//        importOrder()
-//        removeUnusedImports()
-//        toggleOffOn()
-//        googleJavaFormat('1.12.0')
-//        indentWithTabs(2)
-//        endWithNewline()
-//    }
-//}
+spotless {
+
+    java {
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+
+        importOrder()
+        removeUnusedImports()
+        toggleOffOn()
+        googleJavaFormat('1.12.0')
+        indentWithTabs(2)
+        endWithNewline()
+    }
+}

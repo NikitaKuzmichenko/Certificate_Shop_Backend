@@ -1,11 +1,14 @@
 package com.epam.esm.web.exceptionhandler;
 
+import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.*;
+
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.epam.esm.exception.BadInputException;
 import com.epam.esm.exception.DuplicateEntityException;
 import com.epam.esm.exception.EntityNotExistException;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -15,10 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
-import java.util.Locale;
-
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

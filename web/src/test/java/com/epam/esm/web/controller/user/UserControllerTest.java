@@ -114,5 +114,4 @@ class UserControllerTest {
 				.then()
 				.statusCode(201);
 	}
-
 }

@@ -6,19 +6,17 @@ import static org.mockito.Mockito.when;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.mapper.TagDtoMapper;
-import com.epam.esm.dto.mapper.UserDtoMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.BadInputException;
 import com.epam.esm.exception.DuplicateEntityException;
 import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.repository.compound.tag.TagRepository;
 import com.epam.esm.service.TagService;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import javax.persistence.NoResultException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,8 +28,6 @@ import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
-import javax.persistence.NoResultException;
 
 public class TagServiceImplTest {
 
@@ -51,6 +47,7 @@ public class TagServiceImplTest {
 
 		testTagDto = TagDtoMapper.mapTagToDto(testTag);
 	}
+
 	@AfterEach
 	public void resetMocks() {
 		Mockito.reset(tagRepository);
@@ -65,35 +62,35 @@ public class TagServiceImplTest {
 	@Test
 	void getNotExistingTag() {
 		when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
-		Assertions.assertThrows(EntityNotExistException.class,()->tagService.getById(1));
+		Assertions.assertThrows(EntityNotExistException.class, () -> tagService.getById(1));
 	}
 
 	@Test
 	void createTag() {
 		when(tagRepository.save(anyObject())).thenReturn(testTag);
-		Assertions.assertEquals(testTag.getId(),tagService.create(testTagDto));
+		Assertions.assertEquals(testTag.getId(), tagService.create(testTagDto));
 	}
 
 	@Test
 	void failedCreateTag() {
 		when(tagRepository.save(anyObject())).thenThrow(new DuplicateKeyException(""));
-		Assertions.assertThrows(DuplicateEntityException.class,() -> tagService.create(testTagDto));
+		Assertions.assertThrows(DuplicateEntityException.class, () -> tagService.create(testTagDto));
 	}
 
 	@Test
 	void deleteTag() {
 		when(tagRepository.findById(anyLong())).thenReturn(Optional.ofNullable(testTag));
-		Assertions.assertDoesNotThrow(()->tagService.delete(1));
+		Assertions.assertDoesNotThrow(() -> tagService.delete(1));
 	}
 
 	@Test
 	void DeleteNotExistingTag() {
 		when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
-		Assertions.assertThrows(EntityNotExistException.class,()->tagService.delete(1));
+		Assertions.assertThrows(EntityNotExistException.class, () -> tagService.delete(1));
 	}
 
 	@Test
-	void persistTags(){
+	void persistTags() {
 		Set<Tag> tags = Set.of(testTag);
 		Set<TagDto> dtos = Set.of(testTagDto);
 		when(tagRepository.persistTags(anyCollection())).thenReturn(tags);
@@ -101,7 +98,7 @@ public class TagServiceImplTest {
 	}
 
 	@Test
-	void persistNullTags(){
+	void persistNullTags() {
 		Set<Tag> tags = Set.of(testTag);
 		Set<TagDto> dtos = Set.of();
 		when(tagRepository.persistTags(anyCollection())).thenReturn(tags);
@@ -111,7 +108,7 @@ public class TagServiceImplTest {
 	@Test
 	void getPopular() {
 		when(tagRepository.getPopular()).thenReturn(testTag);
-		Assertions.assertEquals(testTagDto,tagService.getPopular());
+		Assertions.assertEquals(testTagDto, tagService.getPopular());
 	}
 
 	@Test
@@ -131,11 +128,9 @@ public class TagServiceImplTest {
 
 	@ParameterizedTest
 	@CsvSource({"-1,-1", "-1,1", "1,-1"})
-	void getAllUserWitchIncorrectLimitAndOffset(int limit,int offset) {
+	void getAllUserWitchIncorrectLimitAndOffset(int limit, int offset) {
 		List<Tag> tags = List.of(testTag, testTag);
 		when(tagRepository.findAll((Pageable) anyObject())).thenReturn(new PageImpl<>(tags));
-		Assertions.assertThrows(BadInputException.class,
-				()->tagService.getAll(limit, offset));
+		Assertions.assertThrows(BadInputException.class, () -> tagService.getAll(limit, offset));
 	}
-
 }

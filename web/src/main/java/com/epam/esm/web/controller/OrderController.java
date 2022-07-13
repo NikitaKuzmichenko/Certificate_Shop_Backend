@@ -1,11 +1,19 @@
 package com.epam.esm.web.controller;
 
+import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.badRequestResponse;
+
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.PurchaseDto;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.web.representation.assembler.OrderRepresentationAssembler;
 import com.epam.esm.web.representation.dto.collection.CollectionWrapper;
 import com.epam.esm.web.representation.dto.mapper.OrderViewDtoMapper;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -13,15 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.badRequestResponse;
 
 @RequestMapping("/orders")
 @RestController
@@ -75,7 +74,7 @@ public class OrderController {
 		OrderDto orders = orderService.getByOrderId(orderId);
 
 		return ResponseEntity.status(HttpStatus.OK.value())
-						.body(orderRepresentationAssembler.toModel(OrderViewDtoMapper.toViewDto(orders)));
+				.body(orderRepresentationAssembler.toModel(OrderViewDtoMapper.toViewDto(orders)));
 	}
 
 	@PreAuthorize(
@@ -92,6 +91,6 @@ public class OrderController {
 
 		Long id = orderService.create(order);
 		return ResponseEntity.status(HttpStatus.CREATED.value())
-						.body(orderRepresentationAssembler.getLinksForCreateOrder(id, userId, certificateId));
+				.body(orderRepresentationAssembler.getLinksForCreateOrder(id, userId, certificateId));
 	}
 }

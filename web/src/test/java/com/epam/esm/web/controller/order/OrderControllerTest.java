@@ -93,7 +93,8 @@ class OrderControllerTest {
 			username = "user",
 			authorities = {"READ_ALL"})
 	void getNotExistingOrderById() {
-		Mockito.when(orderService.getByOrderId(Mockito.anyLong())).thenThrow(new EntityNotExistException());
+		Mockito.when(orderService.getByOrderId(Mockito.anyLong()))
+				.thenThrow(new EntityNotExistException());
 
 		RestAssuredMockMvc.given().when().get(GET_BY_ID_PATH).then().statusCode(404);
 	}

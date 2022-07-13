@@ -18,15 +18,11 @@ import com.epam.esm.exception.BadInputException;
 import com.epam.esm.exception.EntityNotExistException;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.service.OrderService;
-import com.epam.esm.service.implementation.GiftCertificateServiceImpl;
-import com.epam.esm.service.implementation.OrderServiceImpl;
-import com.epam.esm.service.implementation.UserServiceImpl;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,19 +31,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 public class OrderServiceImplTest {
 
 	@Mock private static final OrderRepository orderRepository = mock(OrderRepository.class);
 
-	@Mock private static final GiftCertificateServiceImpl certificateService = mock(GiftCertificateServiceImpl.class);
+	@Mock
+	private static final GiftCertificateServiceImpl certificateService =
+			mock(GiftCertificateServiceImpl.class);
 
 	@Mock private static final UserServiceImpl userService = mock(UserServiceImpl.class);
 
-	private static final OrderService orderService = new OrderServiceImpl(orderRepository, userService, certificateService);
+	private static final OrderService orderService =
+			new OrderServiceImpl(orderRepository, userService, certificateService);
 
 	private static Order testOrder;
 
@@ -110,7 +106,7 @@ public class OrderServiceImplTest {
 		when(certificateService.getById(anyInt())).thenReturn(testCertificateDto);
 		when(userService.getById(anyInt())).thenThrow(new EntityNotExistException());
 
-		Assertions.assertThrows(EntityNotExistException.class,()->orderService.create(testOrderDto));
+		Assertions.assertThrows(EntityNotExistException.class, () -> orderService.create(testOrderDto));
 	}
 
 	@Test
@@ -119,7 +115,7 @@ public class OrderServiceImplTest {
 		when(certificateService.getById(anyInt())).thenThrow(new EntityNotExistException());
 		when(userService.getById(anyInt())).thenReturn(testUserDto);
 
-		Assertions.assertThrows(EntityNotExistException.class,()->orderService.create(testOrderDto));
+		Assertions.assertThrows(EntityNotExistException.class, () -> orderService.create(testOrderDto));
 	}
 
 	@Test
@@ -139,17 +135,18 @@ public class OrderServiceImplTest {
 		when(orderRepository.getOrders(anyObject(), anyObject())).thenReturn(orders);
 		when(userService.getById(anyInt())).thenThrow(new EntityNotExistException());
 
-		Assertions.assertThrows(EntityNotExistException.class, ()->orderService.getByUserId(1, 1, 1));
+		Assertions.assertThrows(EntityNotExistException.class, () -> orderService.getByUserId(1, 1, 1));
 	}
 
 	@ParameterizedTest
 	@CsvSource({"-1,-1", "-1,1", "1,-1"})
-	void getAllUserWitchIncorrectLimitAndOffset(int limit,int offset) {
+	void getAllUserWitchIncorrectLimitAndOffset(int limit, int offset) {
 		List<Order> orders = List.of(testOrder);
 		when(orderRepository.getOrders(anyObject(), anyObject())).thenReturn(orders);
 		when(userService.getById(anyInt())).thenReturn(testUserDto);
 
-		Assertions.assertThrows(BadInputException.class, ()->orderService.getByUserId(1, limit, offset));
+		Assertions.assertThrows(
+				BadInputException.class, () -> orderService.getByUserId(1, limit, offset));
 	}
 
 	@Test
@@ -161,6 +158,6 @@ public class OrderServiceImplTest {
 	@Test
 	void getNotExistingOrderById() {
 		when(orderRepository.findById(anyLong())).thenReturn(Optional.empty());
-		Assertions.assertThrows(EntityNotExistException.class, ()->orderService.getByOrderId(1));
+		Assertions.assertThrows(EntityNotExistException.class, () -> orderService.getByOrderId(1));
 	}
 }

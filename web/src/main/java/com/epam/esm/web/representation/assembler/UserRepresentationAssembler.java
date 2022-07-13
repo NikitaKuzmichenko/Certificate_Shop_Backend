@@ -24,7 +24,7 @@ public class UserRepresentationAssembler
 	@Override
 	public void addLinks(EntityModel<UserViewDto> resource) {
 		UserViewDto dto = resource.getContent();
-		long id =0;
+		long id = 0;
 		if (dto != null) {
 			id = dto.getId();
 		}

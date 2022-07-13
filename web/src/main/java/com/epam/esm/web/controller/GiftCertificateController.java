@@ -1,11 +1,16 @@
 package com.epam.esm.web.controller;
 
+import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.badRequestResponse;
+
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.service.CertificateCriteriaBuilderService;
 import com.epam.esm.service.implementation.GiftCertificateServiceImpl;
 import com.epam.esm.web.representation.assembler.GiftCertificateRepresentationAssembler;
 import com.epam.esm.web.representation.dto.collection.CollectionWrapper;
 import com.epam.esm.web.representation.dto.mapper.GiftCertificateViewDtoMapper;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.hateoas.CollectionModel;
@@ -14,12 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
-import static com.epam.esm.web.exceptionhandler.ExceptionResponseCreator.badRequestResponse;
 
 @RequestMapping("/certificates")
 @RestController
@@ -41,7 +40,7 @@ public class GiftCertificateController {
 
 		Long id = service.create(certificate);
 		return ResponseEntity.status(HttpStatus.CREATED.value())
-						.body(giftCertificateRepresentationAssembler.getLinksForCreate(id));
+				.body(giftCertificateRepresentationAssembler.getLinksForCreate(id));
 	}
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
@@ -57,7 +56,7 @@ public class GiftCertificateController {
 
 		Long createdId = service.patchOrCreate(certificate);
 		return ResponseEntity.status(HttpStatus.CREATED)
-						.body(giftCertificateRepresentationAssembler.getLinksForCreate(createdId));
+				.body(giftCertificateRepresentationAssembler.getLinksForCreate(createdId));
 	}
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
@@ -70,7 +69,7 @@ public class GiftCertificateController {
 		service.patch(service.replaceAllNotNullParams(original, certificate));
 
 		return ResponseEntity.status(HttpStatus.OK)
-						.body(giftCertificateRepresentationAssembler.getLinksForPatch(certificate));
+				.body(giftCertificateRepresentationAssembler.getLinksForPatch(certificate));
 	}
 
 	@PreAuthorize("permitAll()")
@@ -138,6 +137,6 @@ public class GiftCertificateController {
 	public ResponseEntity<?> deleteGiftCertificate(@PathVariable("id") long id, Locale locale) {
 		service.delete(id);
 		return ResponseEntity.status(HttpStatus.OK.value())
-						.body(giftCertificateRepresentationAssembler.getLinksForDelete(id));
+				.body(giftCertificateRepresentationAssembler.getLinksForDelete(id));
 	}
 }
