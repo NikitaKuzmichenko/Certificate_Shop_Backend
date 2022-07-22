@@ -11,6 +11,9 @@ import com.epam.esm.web.representation.dto.mapper.GiftCertificateViewDtoMapper;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.hateoas.CollectionModel;
@@ -35,6 +38,7 @@ public class GiftCertificateController {
 
 	@PreAuthorize("hasAuthority('WRITE_ALL')")
 	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "create new gift certificate")
 	public ResponseEntity<?> createGiftCertificate(
 			@RequestBody GiftCertificateDto certificate, Locale locale) {
 
@@ -45,6 +49,7 @@ public class GiftCertificateController {
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
 	@PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "put gift certificate")
 	public ResponseEntity<?> putGiftCertificates(
 			@PathVariable("id") long id, @RequestBody GiftCertificateDto certificate, Locale locale) {
 
@@ -61,6 +66,7 @@ public class GiftCertificateController {
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
 	@PatchMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "patch gift certificate")
 	public ResponseEntity<?> patchGiftCertificates(
 			@PathVariable("id") long id, @RequestBody GiftCertificateDto certificate, Locale locale) {
 
@@ -74,6 +80,7 @@ public class GiftCertificateController {
 
 	@PreAuthorize("permitAll()")
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get gift certificate")
 	public ResponseEntity<?> getGiftCertificate(@PathVariable("id") long id, Locale locale) {
 
 		GiftCertificateDto certificate = service.getById(id);
@@ -86,6 +93,7 @@ public class GiftCertificateController {
 
 	@PreAuthorize("permitAll()")
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get collection of gift certificates")
 	public ResponseEntity<?> getAll(
 			@RequestParam(required = false) String sortField,
 			@RequestParam(required = false) boolean asc,
@@ -134,6 +142,7 @@ public class GiftCertificateController {
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
 	@DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "delete gift certificate")
 	public ResponseEntity<?> deleteGiftCertificate(@PathVariable("id") long id, Locale locale) {
 		service.delete(id);
 		return ResponseEntity.status(HttpStatus.OK.value())

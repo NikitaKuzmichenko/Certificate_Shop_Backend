@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -35,6 +38,7 @@ public class OrderController {
 
 	@PreAuthorize("hasAuthority('READ_ALL') and #userId == authentication.principal")
 	@GetMapping(value = "user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get orders by user id")
 	public ResponseEntity<?> getUserOrders(
 			@PathVariable("userId") long userId,
 			@RequestParam(required = false) Long offset,
@@ -70,6 +74,7 @@ public class OrderController {
 
 	@PreAuthorize("hasAuthority('READ_ALL')")
 	@GetMapping(value = "{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get order by id")
 	public ResponseEntity<?> getOrders(@PathVariable("orderId") long orderId, Locale locale) {
 		OrderDto orders = orderService.getByOrderId(orderId);
 
@@ -80,6 +85,7 @@ public class OrderController {
 	@PreAuthorize(
 			"(hasAuthority('WRITE_ALL') or hasAuthority('ORDER_CERTIFICATE')) and #userId == authentication.principal")
 	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "create new order")
 	public ResponseEntity<?> createOrder(
 			@RequestParam long userId, @RequestParam Set<Long> certificateId, Locale locale) {
 

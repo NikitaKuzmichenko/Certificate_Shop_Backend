@@ -8,6 +8,9 @@ import com.epam.esm.web.representation.dto.mapper.TagViewDtoMapper;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -29,6 +32,7 @@ public class TagController {
 
 	@PreAuthorize("hasAuthority('READ_ALL')")
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get tag")
 	public ResponseEntity<?> getTag(@PathVariable("id") long id, Locale locale) {
 		TagDto tag = service.getById(id);
 		return ResponseEntity.status(HttpStatus.OK.value())
@@ -37,6 +41,7 @@ public class TagController {
 
 	@PreAuthorize("hasAuthority('READ_ALL')")
 	@GetMapping(value = "/popular", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get popular tag")
 	public ResponseEntity<?> getPopularTag(Locale locale) {
 
 		TagDto tag = service.getPopular();
@@ -46,6 +51,7 @@ public class TagController {
 
 	@PreAuthorize("hasAuthority('READ_ALL')")
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get collection of tags")
 	public ResponseEntity<?> getTags(
 			@RequestParam(required = false) Long offset,
 			@RequestParam(required = false) Long limit,
@@ -75,6 +81,7 @@ public class TagController {
 
 	@PreAuthorize("hasAuthority('WRITE_ALL')")
 	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "create new tag")
 	public ResponseEntity<?> createTag(@RequestBody TagDto tag, Locale locale) {
 		Long id = service.create(tag);
 
@@ -84,6 +91,7 @@ public class TagController {
 
 	@PreAuthorize("hasAuthority('MODIFY_ALL')")
 	@DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "{id}")
+	@ApiOperation(value = "delete tag tag")
 	public ResponseEntity<?> deleteTag(@PathVariable("id") long id, Locale locale) {
 		service.delete(id);
 

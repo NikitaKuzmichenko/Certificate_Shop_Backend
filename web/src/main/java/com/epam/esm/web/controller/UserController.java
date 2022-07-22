@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -33,6 +36,7 @@ public class UserController {
 
 	@PreAuthorize("hasAuthority('READ_ALL') and #id == authentication.principal")
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get user")
 	public ResponseEntity<?> getUser(@PathVariable("id") long id, Locale locale) {
 		UserDto user = userService.getById(id);
 		return ResponseEntity.status(HttpStatus.OK.value())
@@ -41,6 +45,7 @@ public class UserController {
 
 	@PreAuthorize("hasAuthority('READ_ALL')")
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "get collection of users")
 	public ResponseEntity<?> getUsers(
 			@RequestParam(required = false) Long offset,
 			@RequestParam(required = false) Long limit,
@@ -71,6 +76,7 @@ public class UserController {
 
 	@PreAuthorize("permitAll()")
 	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "create guest user")
 	public ResponseEntity<?> createDefaultUsers(@RequestBody UserDto user, Locale locale) {
 		user.setRoles(DEFAULT_ROLES);
 		Long id = userService.createAndEncodePassword(user);
