@@ -15,3 +15,8 @@ services:
       - POSTGRES_PASSWORD=17021972
       - POSTGRES_USER=postgres
       - POSTGRES_DB=spring_app
+    volumes:
+      - dbvolume:/var/lib/postgresql/data
+
+volumes:
+  dbvolume:

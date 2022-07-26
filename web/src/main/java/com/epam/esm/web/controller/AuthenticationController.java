@@ -7,10 +7,8 @@ import com.epam.esm.service.RefreshTokenService;
 import com.epam.esm.service.UserService;
 import com.epam.esm.web.security.token.jwt.JwtTokenManager;
 import com.epam.esm.web.security.token.refresh.RefreshTokenManager;
-import java.util.Locale;
-
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

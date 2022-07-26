@@ -5,12 +5,10 @@ import com.epam.esm.service.implementation.TagServiceImpl;
 import com.epam.esm.web.representation.assembler.TagRepresentationAssembler;
 import com.epam.esm.web.representation.dto.collection.CollectionWrapper;
 import com.epam.esm.web.representation.dto.mapper.TagViewDtoMapper;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;

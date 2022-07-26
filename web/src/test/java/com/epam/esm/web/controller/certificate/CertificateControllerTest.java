@@ -4,7 +4,6 @@ import static com.epam.esm.web.utils.Utils.parsIntegerFromLong;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.*;
 
-import com.epam.esm.Config;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.DuplicateEntityException;
@@ -15,7 +14,6 @@ import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
